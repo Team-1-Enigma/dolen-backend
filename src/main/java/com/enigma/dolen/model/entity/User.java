@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import com.enigma.dolen.constant.Gender;
+import com.enigma.dolen.constant.EGender;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -38,7 +38,7 @@ public class User {
     private String phoneNumber;
 
     @Column(name = "gender")
-    private Gender gender;
+    private EGender gender;
 
     @Column(name = "birth_date")
     private LocalDate birthDate;

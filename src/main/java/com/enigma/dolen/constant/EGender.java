@@ -1,6 +1,6 @@
 package com.enigma.dolen.constant;
 
-public enum Gender {
+public enum EGender {
 
     MALE, FEMALE
 }

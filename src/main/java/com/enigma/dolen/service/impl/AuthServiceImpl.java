@@ -23,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
-    // private final UserService userService;
+    private final UserService userService;
     private final RoleService roleService;
     private final UserCredentialRepository userCredentialRepository;
 
@@ -37,32 +37,27 @@ public class AuthServiceImpl implements AuthService {
         return new LoginResponse(userCredential.getUser().getId(), userCredential.getEmail());
     }
 
-    @Transactional
+    @Transactional(rollbackOn = Exception.class)
     @Override
     public RegisterResponse register(UserDTO userDTO) {
-        try {
-            User user = User.builder()
-                    .fullName(userDTO.getFullName())
-                    .build();
-            // userService.createUser(user);
+        // try {
+        User user = userService.createUser(userDTO);
+        Role role = roleService.getOrSave(ERole.USER);
+        UserCredential userCredential = UserCredential.builder()
+                .email(userDTO.getEmail())
+                .password(userDTO.getPassword())
+                .role(role)
+                .user(user)
+                .build();
+        userCredentialRepository.save(userCredential);
 
-            Role role = roleService.getOrSave(ERole.USER);
-
-            UserCredential userCredential = UserCredential.builder()
-                    .email(userDTO.getEmail())
-                    .password(userDTO.getPassword())
-                    .role(role)
-                    .user(user)
-                    .build();
-            userCredentialRepository.save(userCredential);
-
-            return RegisterResponse.builder()
-                    .id(userCredential.getUser().getId())
-                    .email(userCredential.getEmail())
-                    .role(userCredential.getRole().getName().toString())
-                    .build();
-        } catch (DataIntegrityViolationException e) {
-            throw new RuntimeException("Email already registered");
-        }
+        return RegisterResponse.builder()
+                .id(userCredential.getUser().getId())
+                .email(userCredential.getEmail())
+                .role(userCredential.getRole().getName().toString())
+                .build();
+        // } catch (DataIntegrityViolationException e) {
+        // throw new RuntimeException("Email already registered");
+        // }
     }
 }

@@ -1,11 +1,9 @@
 package com.enigma.dolen.service.impl;
 
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
 import com.enigma.dolen.model.dto.UserDTO;
-import com.enigma.dolen.model.entity.Role;
-import com.enigma.dolen.model.entity.UserCredential;
+import com.enigma.dolen.model.entity.User;
 import com.enigma.dolen.repository.UserRepository;
 import com.enigma.dolen.service.UserService;
 
@@ -17,34 +15,31 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
-    @Override
-    public UserDTO getUserById(String id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getUserById'");
-    }
+    // @Override
+    // public UserDTO getUserById(String id) {
+    // }
+
+    // @Override
+    // public UserDTO getUserByEmail(String email) {
+    // }
 
     @Override
-    public UserDTO getUserByEmail(String email) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getUserByEmail'");
+    public User createUser(UserDTO userDTO) {
+        User user = User.builder()
+                .fullName(userDTO.getFullName())
+                .phoneNumber(userDTO.getPhoneNumber())
+                .isActive(true)
+                .build();
+        userRepository.saveAndFlush(user);
+        return user;
     }
 
-    @Override
-    public UserDTO createUser(UserDTO userDTO) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'createUser'");
-    }
+    // @Override
+    // public UserDTO updateUser(UserDTO userDTO) {
+    // }
 
-    @Override
-    public UserDTO updateUser(UserDTO userDTO) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateUser'");
-    }
-
-    @Override
-    public UserDTO deleteUser(String id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteUser'");
-    }
+    // @Override
+    // public UserDTO deleteUser(String id) {
+    // }
 
 }
