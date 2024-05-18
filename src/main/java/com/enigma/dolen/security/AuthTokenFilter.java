@@ -22,6 +22,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
     private final UserCredentialService userCredentialService;
 
+    @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
             String headerAuth = request.getHeader("Authorization");
@@ -31,12 +32,9 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             }
             if (token != null && jwtUtil.verifyJwtToken(token)) {
                 Map<String, String> userInfo = jwtUtil.getUserInfoByToken(token);
-                UserDetails user = userCredentialService.loadUserByUsername(userInfo.get("userId"));
-
+                UserDetails user = userCredentialService.loadUserById(userInfo.get("credentialId"));
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-
                 authenticationToken.setDetails(new WebAuthenticationDetailsSource());
-
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             }
         } catch (Exception e) {

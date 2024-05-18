@@ -44,6 +44,11 @@ public class UserCredentialServiceImpl implements UserCredentialService {
     }
 
     @Override
+    public UserDetails loadUserById(String credentialId) {
+        return userCredentialRepository.findById(credentialId).orElseThrow(() -> new UsernameNotFoundException("Invalid credential"));
+    }
+
+    @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         return userCredentialRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("Invalid credential"));
     }

@@ -45,6 +45,7 @@ public class AuthServiceImpl implements AuthService {
         String token = jwtUtil.generateToken(userCredential);
 
         return LoginResponse.builder()
+                .credentialId(userCredential.getId())
                 .token(token)
                 .build();
     }
