@@ -5,13 +5,11 @@ import com.enigma.dolen.model.entity.User;
 
 public interface UserService {
 
-    // UserDTO getUserById(String id);
-    //
-    // UserDTO getUserByEmail(String email);
+    User getUserById(String id);
 
     User createUser(UserDTO userDTO);
 
-    // UserDTO updateUser(UserDTO userDTO);
+    User updateUser(UserDTO userDTO);
 
-    // UserDTO deleteUser(String id);
+    User deleteUser(String id);
 }

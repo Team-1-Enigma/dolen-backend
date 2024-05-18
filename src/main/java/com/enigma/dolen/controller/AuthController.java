@@ -24,7 +24,7 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<CommonResponse<?>> login(@RequestBody LoginRequest loginRequest) {
         LoginResponse loginResponse = authService.login(loginRequest);
         CommonResponse<LoginResponse> response = CommonResponse.<LoginResponse>builder()
                 .message("Login success")
@@ -35,7 +35,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody UserDTO userDTO) {
+    public ResponseEntity<CommonResponse<?>> register(@RequestBody UserDTO userDTO) {
         RegisterResponse registerResponse = authService.register(userDTO);
         CommonResponse<RegisterResponse> response = CommonResponse.<RegisterResponse>builder()
                 .message("Register success")
