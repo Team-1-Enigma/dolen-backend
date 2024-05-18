@@ -1,6 +1,6 @@
 package com.enigma.dolen.constant;
 
-public enum Role {
+public enum ERole {
 
     USER, TRAVEL_OWNER
 }
