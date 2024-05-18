@@ -6,8 +6,9 @@ import com.enigma.dolen.model.entity.Role;
 import com.enigma.dolen.model.entity.User;
 import com.enigma.dolen.model.entity.UserCredential;
 import com.enigma.dolen.model.dto.RegisterRequest;
+import org.springframework.security.core.userdetails.UserDetailsService;
 
-public interface UserCredentialService {
+public interface UserCredentialService extends UserDetailsService {
 
     Optional<UserCredential> findByEmail(String email);
 

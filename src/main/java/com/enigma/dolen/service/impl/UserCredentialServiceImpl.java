@@ -2,6 +2,9 @@ package com.enigma.dolen.service.impl;
 
 import java.util.Optional;
 
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.enigma.dolen.model.entity.Role;
@@ -18,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 public class UserCredentialServiceImpl implements UserCredentialService {
 
     private final UserCredentialRepository userCredentialRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public Optional<UserCredential> findByEmail(String email) {
@@ -28,7 +32,7 @@ public class UserCredentialServiceImpl implements UserCredentialService {
     public UserCredential createCredential(RegisterRequest registerRequest, User user, Role role) {
         return userCredentialRepository.save(UserCredential.builder()
                 .email(registerRequest.getEmail())
-                .password(registerRequest.getPassword())
+                .password(passwordEncoder.encode(registerRequest.getPassword()))
                 .role(role)
                 .user(user)
                 .build());
@@ -39,4 +43,8 @@ public class UserCredentialServiceImpl implements UserCredentialService {
         return userCredentialRepository.findById(id).orElse(null);
     }
 
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        return userCredentialRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("Invalid credential"));
+    }
 }
