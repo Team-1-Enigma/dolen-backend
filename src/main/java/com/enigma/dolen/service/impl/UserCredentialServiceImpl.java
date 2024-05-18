@@ -4,12 +4,12 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
-import com.enigma.dolen.model.dto.UserDTO;
 import com.enigma.dolen.model.entity.Role;
 import com.enigma.dolen.model.entity.User;
 import com.enigma.dolen.model.entity.UserCredential;
 import com.enigma.dolen.repository.UserCredentialRepository;
 import com.enigma.dolen.service.UserCredentialService;
+import com.enigma.dolen.model.dto.RegisterRequest;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,10 +25,10 @@ public class UserCredentialServiceImpl implements UserCredentialService {
     }
 
     @Override
-    public UserCredential createCredential(UserDTO userDTO, User user, Role role) {
+    public UserCredential createCredential(RegisterRequest registerRequest, User user, Role role) {
         return userCredentialRepository.save(UserCredential.builder()
-                .email(userDTO.getEmail())
-                .password(userDTO.getPassword())
+                .email(registerRequest.getEmail())
+                .password(registerRequest.getPassword())
                 .role(role)
                 .user(user)
                 .build());

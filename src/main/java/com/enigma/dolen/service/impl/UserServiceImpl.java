@@ -35,8 +35,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User updateUser(UserDTO userDTO) {
-        User user = userRepository.findById(userDTO.getId()).orElse(null);
+    public User updateUser(String id, UserDTO userDTO) {
+        User user = userRepository.findById(id).orElse(null);
         if (user == null) {
             return null;
         }

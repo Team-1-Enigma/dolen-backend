@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import com.enigma.dolen.constant.ERole;
 import com.enigma.dolen.model.dto.LoginRequest;
 import com.enigma.dolen.model.dto.LoginResponse;
+import com.enigma.dolen.model.dto.RegisterRequest;
 import com.enigma.dolen.model.dto.RegisterResponse;
 import com.enigma.dolen.model.dto.UserDTO;
 import com.enigma.dolen.model.entity.Role;
@@ -34,22 +35,25 @@ public class AuthServiceImpl implements AuthService {
             throw new RuntimeException("Invalid password");
         }
         return LoginResponse.builder()
-                .id(userCredential.getId())
+                .credentialId(userCredential.getId())
                 .token("token")
                 .build();
     }
 
     @Transactional(rollbackOn = Exception.class)
     @Override
-    public RegisterResponse register(UserDTO userDTO) {
+    public RegisterResponse register(RegisterRequest registerRequest) {
+        UserDTO userDTO = UserDTO.builder()
+                .fullName(registerRequest.getFullName())
+                .phoneNumber(registerRequest.getPhoneNumber())
+                .build();
         User user = userService.createUser(userDTO);
         Role role = roleService.getOrSave(ERole.USER);
-        UserCredential userCredential = userCredentialService.createCredential(userDTO, user, role);
+        UserCredential userCredential = userCredentialService.createCredential(registerRequest, user, role);
 
         return RegisterResponse.builder()
-                .id(userCredential.getId())
+                .credentialId(userCredential.getId())
                 .email(userCredential.getEmail())
-                .role(userCredential.getRole().getName().toString())
                 .build();
     }
 }

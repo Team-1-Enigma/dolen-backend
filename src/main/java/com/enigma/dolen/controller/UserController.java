@@ -38,10 +38,10 @@ public class UserController {
                 .role(userCredential.getRole().getName().toString())
                 .fullName(user.getFullName())
                 .phoneNumber(user.getPhoneNumber())
-                .gender(user.getGender().toString())
-                .address(user.getAddress())
-                .birthDate(user.getBirthDate().toString())
-                .photoUrl(user.getPhotoUrl())
+                // .gender(user.getGender().toString())
+                // .address(user.getAddress())
+                // .birthDate(user.getBirthDate().toString())
+                // .photoUrl(user.getPhotoUrl())
                 .isActive(user.getIsActive())
                 .build();
 
@@ -53,10 +53,11 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @PutMapping
-    public ResponseEntity<CommonResponse<?>> updateUser(@RequestBody UserDTO userDTO) {
-        User user = userService.updateUser(userDTO);
-        UserCredential userCredential = userCredentialService.findById(userDTO.getCredentialId());
+    @PutMapping("/{id}")
+    public ResponseEntity<CommonResponse<?>> updateUser(@PathVariable String id, @RequestBody UserDTO userDTO) {
+        UserCredential userCredential = userCredentialService.findById(id);
+        User user = userService.updateUser(userCredential.getUser().getId(), userDTO);
+
         UserDTO updatedUser = UserDTO.builder()
                 .id(user.getId())
                 .credentialId(userCredential.getId())
@@ -64,12 +65,13 @@ public class UserController {
                 .role(userCredential.getRole().getName().toString())
                 .fullName(user.getFullName())
                 .phoneNumber(user.getPhoneNumber())
-                .gender(user.getGender().toString())
-                .address(user.getAddress())
-                .birthDate(user.getBirthDate().toString())
-                .photoUrl(user.getPhotoUrl())
+                // .gender(user.getGender().toString())
+                // .address(user.getAddress())
+                // .birthDate(user.getBirthDate().toString())
+                // .photoUrl(user.getPhotoUrl())
                 .isActive(user.getIsActive())
                 .build();
+
         CommonResponse<UserDTO> response = CommonResponse.<UserDTO>builder()
                 .message("User updated")
                 .statusCode(HttpStatus.OK.value())

@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.enigma.dolen.model.dto.CommonResponse;
 import com.enigma.dolen.model.dto.LoginRequest;
 import com.enigma.dolen.model.dto.LoginResponse;
+import com.enigma.dolen.model.dto.RegisterRequest;
 import com.enigma.dolen.model.dto.RegisterResponse;
-import com.enigma.dolen.model.dto.UserDTO;
 import com.enigma.dolen.service.AuthService;
 
 import lombok.RequiredArgsConstructor;
@@ -35,8 +35,8 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<CommonResponse<?>> register(@RequestBody UserDTO userDTO) {
-        RegisterResponse registerResponse = authService.register(userDTO);
+    public ResponseEntity<CommonResponse<?>> register(@RequestBody RegisterRequest registerRequest) {
+        RegisterResponse registerResponse = authService.register(registerRequest);
         CommonResponse<RegisterResponse> response = CommonResponse.<RegisterResponse>builder()
                 .message("Register success")
                 .statusCode(HttpStatus.CREATED.value())

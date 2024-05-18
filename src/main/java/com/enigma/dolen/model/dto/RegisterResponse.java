@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class RegisterResponse {
-    private String id;
+    private String credentialId;
     private String email;
-    private String role;
 }
