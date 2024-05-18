@@ -2,6 +2,8 @@ package com.enigma.dolen.service.impl;
 
 import java.time.LocalDate;
 
+import com.enigma.dolen.model.entity.UserCredential;
+import com.enigma.dolen.service.UserCredentialService;
 import org.springframework.stereotype.Service;
 
 import com.enigma.dolen.constant.EGender;
@@ -17,10 +19,28 @@ import lombok.RequiredArgsConstructor;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final UserCredentialService userCredentialService;
 
     @Override
-    public User getUserById(String id) {
-        return userRepository.findById(id).orElse(null);
+    public UserDTO getUserById(String id) {
+        UserCredential userCredential = userCredentialService.findById(id);
+        User user = userRepository.findById(userCredential.getUser().getId()).orElse(null);
+        if (user == null) {
+            return null;
+        }
+        return UserDTO.builder()
+                .id(user.getId())
+                .credentialId(userCredential.getId())
+                .email(userCredential.getEmail())
+                .role(userCredential.getRole().getName().toString())
+                .fullName(user.getFullName())
+                .phoneNumber(user.getPhoneNumber())
+                // .gender(user.getGender().toString())
+                // .address(user.getAddress())
+                // .birthDate(user.getBirthDate().toString())
+                // .photoUrl(user.getPhotoUrl())
+                .isActive(user.getIsActive())
+                .build();
     }
 
     @Override
@@ -35,8 +55,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User updateUser(String id, UserDTO userDTO) {
-        User user = userRepository.findById(id).orElse(null);
+    public UserDTO updateUser(String id, UserDTO userDTO) {
+        UserCredential userCredential = userCredentialService.findById(id);
+        User user = userRepository.findById(userCredential.getUser().getId()).orElse(null);
         if (user == null) {
             return null;
         }
@@ -47,17 +68,29 @@ public class UserServiceImpl implements UserService {
         user.setGender(EGender.valueOf(userDTO.getGender()));
         user.setPhotoUrl(userDTO.getPhotoUrl());
         userRepository.saveAndFlush(user);
-        return user;
+        return UserDTO.builder()
+                .id(user.getId())
+                .credentialId(userCredential.getId())
+                .email(userCredential.getEmail())
+                .role(userCredential.getRole().getName().toString())
+                .fullName(user.getFullName())
+                .phoneNumber(user.getPhoneNumber())
+                // .gender(user.getGender().toString())
+                // .address(user.getAddress())
+                // .birthDate(user.getBirthDate().toString())
+                // .photoUrl(user.getPhotoUrl())
+                .isActive(user.getIsActive())
+                .build();
     }
 
     @Override
-    public User deleteUser(String id) {
+    public String deleteUser(String id) {
         User user = userRepository.findById(id).orElse(null);
         if (user == null) {
             return null;
         }
         user.setIsActive(false);
         userRepository.save(user);
-        return user;
+        return user.getId();
     }
 }
