@@ -57,7 +57,6 @@ public class UserController {
     public ResponseEntity<CommonResponse<?>> updateUser(@PathVariable String id, @RequestBody UserDTO userDTO) {
         UserCredential userCredential = userCredentialService.findById(id);
         User user = userService.updateUser(userCredential.getUser().getId(), userDTO);
-
         UserDTO updatedUser = UserDTO.builder()
                 .id(user.getId())
                 .credentialId(userCredential.getId())
