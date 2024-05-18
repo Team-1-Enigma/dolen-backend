@@ -1,22 +1,25 @@
-package com.enigma.dolen.model.response;
+package com.enigma.dolen.model.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-
 @Data
-@Builder(toBuilder = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserResponse {
+@Builder
+public class UserDTO {
+    private String id;
+    private String credentialId;
+    private String email;
+    private String password;
     private String fullName;
     private String phoneNumber;
     private String gender;
-    private LocalDate birthDate;
+    private String birthDate;
     private String address;
     private String photoUrl;
+    private Boolean isActive;
+    private String role;
 }

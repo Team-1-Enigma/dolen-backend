@@ -1,69 +1,63 @@
 package com.enigma.dolen.service.impl;
 
-import com.enigma.dolen.constant.Gender;
-import com.enigma.dolen.model.dto.UserDto;
+import java.time.LocalDate;
+
+import org.springframework.stereotype.Service;
+
+import com.enigma.dolen.constant.EGender;
+import com.enigma.dolen.model.dto.UserDTO;
 import com.enigma.dolen.model.entity.User;
 import com.enigma.dolen.repository.UserRepository;
 import com.enigma.dolen.service.UserService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
+
     private final UserRepository userRepository;
 
     @Override
-    public UserDto create(UserDto userDto) {
+    public User getUserById(String id) {
+        return userRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    public User createUser(UserDTO userDTO) {
         User user = User.builder()
-                .fullName(userDto.getFullName())
-                .phoneNumber(userDto.getPhoneNumber())
-                .gender(Gender.valueOf(userDto.getGender()))
-                .birthDate(userDto.getBirthDate())
-                .address(userDto.getAddress())
-                .photoUrl(userDto.getPhotoUrl())
-                .createdAt(LocalDateTime.now())
+                .fullName(userDTO.getFullName())
+                .phoneNumber(userDTO.getPhoneNumber())
                 .isActive(true)
                 .build();
+        userRepository.saveAndFlush(user);
+        return user;
+    }
 
+    @Override
+    public User updateUser(UserDTO userDTO) {
+        User user = userRepository.findById(userDTO.getId()).orElse(null);
+        if (user == null) {
+            return null;
+        }
+        user.setFullName(userDTO.getFullName());
+        user.setPhoneNumber(userDTO.getPhoneNumber());
+        user.setAddress(userDTO.getAddress());
+        user.setBirthDate(LocalDate.parse(userDTO.getBirthDate()));
+        user.setGender(EGender.valueOf(userDTO.getGender()));
+        user.setPhotoUrl(userDTO.getPhotoUrl());
+        userRepository.saveAndFlush(user);
+        return user;
+    }
+
+    @Override
+    public User deleteUser(String id) {
+        User user = userRepository.findById(id).orElse(null);
+        if (user == null) {
+            return null;
+        }
+        user.setIsActive(false);
         userRepository.save(user);
-
-        return UserDto.builder()
-                .fullName(user.getFullName())
-                .fullName(userDto.getFullName())
-                .phoneNumber(userDto.getPhoneNumber())
-                .gender(String.valueOf(user.getGender()))
-                .birthDate(user.getBirthDate())
-                .address(user.getAddress())
-                .photoUrl(user.getPhotoUrl())
-                .build();
-    }
-
-    @Override
-    public UserDto getById(String id) {
-        return null;
-    }
-
-    @Override
-    public List<UserDto> getAll() {
-        return List.of();
-    }
-
-    @Override
-    public UserDto update(UserDto userRequest) {
-        return null;
-    }
-
-    @Override
-    public UserDto delete(String id) {
-        return null;
-    }
-
-    @Override
-    public User getByIdForTravel(String id) {
-        return userRepository.findById(id).orElse(null);
+        return user;
     }
 }

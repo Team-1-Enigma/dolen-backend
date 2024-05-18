@@ -9,18 +9,15 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
-@Builder(toBuilder = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDto {
+@Builder
+public class FeedbackResponse {
     private String id;
-    private String fullName;
-    private String phoneNumber;
-    private String gender;
-    private LocalDate birthDate;
-    private String address;
-    private String photoUrl;
+    private String feedbackText;
+    private String feedbackDate;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private Boolean isActive;
+
+    private TravelDTO travelDTO;
 }

@@ -1,20 +1,23 @@
-package com.enigma.dolen.model.response;
+package com.enigma.dolen.model.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
-@Builder(toBuilder = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class TravelResponse {
-    private String userId;
-    private String name;
+@Builder
+public class FeedbackDTO {
+    private String id;
+    private String feedbackText;
+    private String feedbackDate;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private Boolean isActive;
+
+    private String travelId;
 }

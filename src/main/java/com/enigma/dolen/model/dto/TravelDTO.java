@@ -1,4 +1,4 @@
-package com.enigma.dolen.model.request;
+package com.enigma.dolen.model.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,8 +11,13 @@ import java.time.LocalDateTime;
 @Builder(toBuilder = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class TravelRequest {
-    private String userFullName;
+public class TravelDTO {
+    private String id;
+    private String userId;
     private String name;
+    private String contactInfo;
+    private String address;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
     private Boolean isActive;
 }
