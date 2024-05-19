@@ -1,10 +1,11 @@
 package com.enigma.dolen.service.impl;
 
+import com.enigma.dolen.model.exception.ApplicationException;
 import com.enigma.dolen.security.JwtUtil;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
@@ -37,9 +38,10 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public LoginResponse login(LoginRequest loginRequest) {
-        Authentication authentication = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
-        );
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                loginRequest.getEmail(),
+                loginRequest.getPassword()
+        ));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         UserCredential userCredential = (UserCredential) authentication.getPrincipal();
         String token = jwtUtil.generateToken(userCredential);
@@ -53,6 +55,9 @@ public class AuthServiceImpl implements AuthService {
     @Transactional(rollbackOn = Exception.class)
     @Override
     public RegisterResponse register(RegisterRequest registerRequest) {
+        if (userCredentialService.findByEmail(registerRequest.getEmail()).isPresent()) {
+            throw new ApplicationException("Email already registered", HttpStatus.BAD_REQUEST);
+        }
         UserDTO userDTO = UserDTO.builder()
                 .fullName(registerRequest.getFullName())
                 .phoneNumber(registerRequest.getPhoneNumber())

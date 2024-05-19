@@ -12,13 +12,13 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class ApplicationExceptionHandler {
+
     @ExceptionHandler(ApplicationException.class)
     public ResponseEntity<?> handleApplicationException(ApplicationException e, HttpServletRequest request) {
         ApiErrorResponse response = new ApiErrorResponse(
-                e.getErrorCode(),
-                e.getMessage(),
                 e.getHttpStatus().value(),
                 e.getHttpStatus().name(),
+                e.getMessage(),
                 request.getRequestURI(),
                 request.getMethod()
         );

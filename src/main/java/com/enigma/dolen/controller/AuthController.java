@@ -26,22 +26,22 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<CommonResponse<?>> login(@RequestBody LoginRequest loginRequest) {
         LoginResponse loginResponse = authService.login(loginRequest);
-        CommonResponse<LoginResponse> response = CommonResponse.<LoginResponse>builder()
-                .message("Login success")
+        return ResponseEntity.status(HttpStatus.OK).body(CommonResponse.<LoginResponse>builder()
                 .statusCode(HttpStatus.OK.value())
+                .message("Login success")
                 .data(loginResponse)
-                .build();
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+                .build()
+        );
     }
 
     @PostMapping("/register")
     public ResponseEntity<CommonResponse<?>> register(@RequestBody RegisterRequest registerRequest) {
         RegisterResponse registerResponse = authService.register(registerRequest);
-        CommonResponse<RegisterResponse> response = CommonResponse.<RegisterResponse>builder()
+        return ResponseEntity.status(HttpStatus.CREATED).body(CommonResponse.<RegisterResponse>builder()
                 .message("Register success")
                 .statusCode(HttpStatus.CREATED.value())
                 .data(registerResponse)
-                .build();
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+                .build()
+        );
     }
 }

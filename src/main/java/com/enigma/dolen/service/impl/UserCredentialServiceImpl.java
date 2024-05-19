@@ -2,6 +2,8 @@ package com.enigma.dolen.service.impl;
 
 import java.util.Optional;
 
+import com.enigma.dolen.model.exception.ApplicationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -40,16 +42,19 @@ public class UserCredentialServiceImpl implements UserCredentialService {
 
     @Override
     public UserCredential findById(String id) {
-        return userCredentialRepository.findById(id).orElse(null);
+        return userCredentialRepository.findById(id)
+                .orElseThrow(() -> new ApplicationException("User credential not found", HttpStatus.NOT_FOUND));
     }
 
     @Override
     public UserDetails loadUserById(String credentialId) {
-        return userCredentialRepository.findById(credentialId).orElseThrow(() -> new UsernameNotFoundException("Invalid credential"));
+        return userCredentialRepository.findById(credentialId)
+                .orElseThrow(() -> new ApplicationException("User credential not found", HttpStatus.NOT_FOUND));
     }
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return userCredentialRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("Invalid credential"));
+        return userCredentialRepository.findByEmail(email)
+                .orElseThrow(() -> new ApplicationException("User not found", HttpStatus.NOT_FOUND));
     }
 }

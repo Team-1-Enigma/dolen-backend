@@ -26,16 +26,16 @@ public class SecurityConfiguration {
 //        this.authTokenFilter = authTokenFilter;
 //    }
 
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
-    }
-
     private static final String[] WHITE_LIST_URL = {
         "/api/auth/**",
         "/swagger-ui/**",
         "/v3/api-docs/**",
     };
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, AuthTokenFilter authTokenFilter) throws Exception {
