@@ -50,8 +50,10 @@ public class AuthServiceImpl implements AuthService {
         String token = jwtUtil.generateToken(appUser);
 
         return LoginResponse.builder()
-                .credentialId(appUser.getId())
                 .token(token)
+                .credentialId(appUser.getId())
+                .email(appUser.getEmail())
+                .role(String.valueOf(appUser.getRole()))
                 .build();
     }
 

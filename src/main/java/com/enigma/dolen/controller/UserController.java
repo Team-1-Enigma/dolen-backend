@@ -1,13 +1,11 @@
 package com.enigma.dolen.controller;
 
-import com.enigma.dolen.service.UserVerificationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.enigma.dolen.model.dto.CommonResponse;
 import com.enigma.dolen.model.dto.UserDTO;
-import com.enigma.dolen.model.entity.User;
 import com.enigma.dolen.model.entity.UserCredential;
 import com.enigma.dolen.service.UserCredentialService;
 import com.enigma.dolen.service.UserService;

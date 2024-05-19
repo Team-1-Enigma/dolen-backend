@@ -1,6 +1,5 @@
 package com.enigma.dolen.service.impl;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Optional;
 
@@ -8,7 +7,6 @@ import com.enigma.dolen.model.entity.UserCredential;
 import com.enigma.dolen.model.exception.ApplicationException;
 import com.enigma.dolen.service.UploadImageService;
 import com.enigma.dolen.service.UserCredentialService;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -20,8 +18,6 @@ import com.enigma.dolen.service.UserService;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
-import software.amazon.awssdk.core.sync.RequestBody;
-import software.amazon.awssdk.services.s3.S3Client;
 
 @Service
 @RequiredArgsConstructor
@@ -30,9 +26,6 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserCredentialService userCredentialService;
     private final UploadImageService uploadImageService;
-    private final S3Client s3Client;
-    @Value("${aws.bucket.name}")
-    private String bucketName;
 
     @Override
     public UserDTO getUserById(String id) {
@@ -86,17 +79,6 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
         return photoUrl;
     }
-
-//    private String uploadFile(MultipartFile file, String id) {
-//        try {
-//            String fileName = "user-profile-photos/" + System.currentTimeMillis() + "_" + id;
-//            s3Client.putObject(builder -> builder.bucket(bucketName).key(fileName).build(),
-//                    RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
-//            return s3Client.utilities().getUrl(builder -> builder.bucket(bucketName).key(fileName)).toExternalForm();
-//        } catch (IOException e) {
-//            throw new ApplicationException("Failed to upload photo", HttpStatus.INTERNAL_SERVER_ERROR);
-//        }
-//    }
 
     private static UserDTO getUserDTO(User user, UserCredential userCredential) {
         return UserDTO.builder()
