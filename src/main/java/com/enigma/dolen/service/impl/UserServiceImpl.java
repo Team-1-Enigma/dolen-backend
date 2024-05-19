@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import com.enigma.dolen.model.entity.UserCredential;
 import com.enigma.dolen.model.exception.ApplicationException;
+import com.enigma.dolen.service.UploadImageService;
 import com.enigma.dolen.service.UserCredentialService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -28,6 +29,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final UserCredentialService userCredentialService;
+    private final UploadImageService uploadImageService;
     private final S3Client s3Client;
     @Value("${aws.bucket.name}")
     private String bucketName;
@@ -79,22 +81,22 @@ public class UserServiceImpl implements UserService {
         UserCredential userCredential = userCredentialService.findById(id);
         User user = userRepository.findById(userCredential.getUser().getId())
                 .orElseThrow(() -> new ApplicationException("User not found", HttpStatus.NOT_FOUND));
-        String photoUrl = uploadFile(file, id);
+        String photoUrl = uploadImageService.uploadImage(file);
         user.setPhotoUrl(photoUrl);
         userRepository.save(user);
         return photoUrl;
     }
 
-    private String uploadFile(MultipartFile file, String id) {
-        try {
-            String fileName = "user-images/" + System.currentTimeMillis() + "_" + id;
-            s3Client.putObject(builder -> builder.bucket(bucketName).key(fileName).build(),
-                    RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
-            return s3Client.utilities().getUrl(builder -> builder.bucket(bucketName).key(fileName)).toExternalForm();
-        } catch (IOException e) {
-            throw new ApplicationException("Failed to upload photo", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
+//    private String uploadFile(MultipartFile file, String id) {
+//        try {
+//            String fileName = "user-profile-photos/" + System.currentTimeMillis() + "_" + id;
+//            s3Client.putObject(builder -> builder.bucket(bucketName).key(fileName).build(),
+//                    RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
+//            return s3Client.utilities().getUrl(builder -> builder.bucket(bucketName).key(fileName)).toExternalForm();
+//        } catch (IOException e) {
+//            throw new ApplicationException("Failed to upload photo", HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
+//    }
 
     private static UserDTO getUserDTO(User user, UserCredential userCredential) {
         return UserDTO.builder()

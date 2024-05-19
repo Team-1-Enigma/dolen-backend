@@ -24,16 +24,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableMethodSecurity
 public class SecurityConfiguration {
 
-//    private final AuthTokenFilter authTokenFilter;
-//
-//    public SecurityConfiguration(AuthTokenFilter authTokenFilter) {
-//        this.authTokenFilter = authTokenFilter;
-//    }
-
     private static final String[] WHITE_LIST_URL = {
-        "/api/auth/**",
-        "/swagger-ui/**",
-        "/v3/api-docs/**",
+        "/api/auth/login",
+        "/api/auth/register",
+        "/api/user/verify",
+        "/verify",
     };
 
     @Bean

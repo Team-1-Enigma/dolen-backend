@@ -1,5 +1,6 @@
 package com.enigma.dolen.controller;
 
+import com.enigma.dolen.service.UserVerificationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +22,7 @@ public class UserController {
 
     private final UserService userService;
     private final UserCredentialService userCredentialService;
+    private final UserVerificationService userVerificationService;
 
     @GetMapping("/{id}")
     public ResponseEntity<CommonResponse<?>> getUserById(@PathVariable String id) {
@@ -56,13 +58,24 @@ public class UserController {
         );
     }
 
-    @PostMapping("/{id}/image")
+    @PostMapping("/{id}/photo")
     public ResponseEntity<CommonResponse<?>> uploadPhoto(@RequestParam("file") MultipartFile file, @PathVariable String id) {
         String data = userService.uploadPhoto(file, id);
         return ResponseEntity.status(HttpStatus.OK).body(CommonResponse.<String>builder()
                 .message("Photo uploaded")
                 .statusCode(HttpStatus.OK.value())
                 .data(data)
+                .build()
+        );
+    }
+
+    @GetMapping("/verify")
+    public ResponseEntity<CommonResponse<?>> verifyUser(@RequestParam int code) {
+        boolean isVerified = userVerificationService.verify(code);
+        return ResponseEntity.status(HttpStatus.OK).body(CommonResponse.<Boolean>builder()
+                .message("User verified")
+                .statusCode(HttpStatus.OK.value())
+                .data(isVerified)
                 .build()
         );
     }
