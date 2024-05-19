@@ -1,11 +1,7 @@
 package com.enigma.dolen.service.impl;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.util.Objects;
 import java.util.Optional;
 
 import com.enigma.dolen.model.entity.UserCredential;
