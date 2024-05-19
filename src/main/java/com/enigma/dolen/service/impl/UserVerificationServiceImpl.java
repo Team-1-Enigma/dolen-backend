@@ -51,7 +51,7 @@ public class UserVerificationServiceImpl implements UserVerificationService {
                 + "Dolen.";
 
         content = content.replace("[[name]]", userCredential.getUser().getFullName());
-        String verifyURL = url + "/api/user/verify?code=" + userVerification.getVerificationCode();
+        String verifyURL = url + "/api/verify?code=" + userVerification.getVerificationCode();
         content = content.replace("[[URL]]", verifyURL);
 
         emailService.sendEmail(toAddress, fromAddress, senderName, subject, content);

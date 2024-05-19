@@ -22,7 +22,6 @@ public class UserController {
 
     private final UserService userService;
     private final UserCredentialService userCredentialService;
-    private final UserVerificationService userVerificationService;
 
     @GetMapping("/{id}")
     public ResponseEntity<CommonResponse<?>> getUserById(@PathVariable String id) {
@@ -65,17 +64,6 @@ public class UserController {
                 .message("Photo uploaded")
                 .statusCode(HttpStatus.OK.value())
                 .data(data)
-                .build()
-        );
-    }
-
-    @GetMapping("/verify")
-    public ResponseEntity<CommonResponse<?>> verifyUser(@RequestParam int code) {
-        boolean isVerified = userVerificationService.verify(code);
-        return ResponseEntity.status(HttpStatus.OK).body(CommonResponse.<Boolean>builder()
-                .message("User verified")
-                .statusCode(HttpStatus.OK.value())
-                .data(isVerified)
                 .build()
         );
     }
