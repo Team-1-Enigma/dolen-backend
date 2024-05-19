@@ -14,5 +14,5 @@ public interface UserService {
 
     String deleteUser(String id);
 
-    String uploadImage(String id, MultipartFile file);
+    String uploadPhoto(MultipartFile file, String id);
 }
