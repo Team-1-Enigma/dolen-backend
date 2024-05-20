@@ -9,16 +9,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class UserDTO {
-    private String id;
-    private String credentialId;
+public class RegisterRequest {
     private String email;
+    private String password;
     private String fullName;
     private String phoneNumber;
-    private String gender;
-    private String birthDate;
-    private String address;
-    private String photoUrl;
-    private String role;
-    private Boolean isActive;
 }

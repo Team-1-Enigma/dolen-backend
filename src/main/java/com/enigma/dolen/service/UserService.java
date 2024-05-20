@@ -2,14 +2,17 @@ package com.enigma.dolen.service;
 
 import com.enigma.dolen.model.dto.UserDTO;
 import com.enigma.dolen.model.entity.User;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface UserService {
 
-    User getUserById(String id);
-
     User createUser(UserDTO userDTO);
 
-    User updateUser(UserDTO userDTO);
+    UserDTO getUserById(String id);
 
-    User deleteUser(String id);
+    UserDTO updateUser(String id, UserDTO userDTO);
+
+    String deleteUser(String id);
+
+    String uploadPhoto(MultipartFile file, String id);
 }
