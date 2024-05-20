@@ -1,5 +1,6 @@
 package com.enigma.dolen.service.impl;
 
+import com.enigma.dolen.constant.EGender;
 import com.enigma.dolen.constant.ERole;
 import com.enigma.dolen.model.dto.TravelDTO;
 import com.enigma.dolen.model.dto.TravelResponse;
@@ -14,9 +15,12 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.fasterxml.jackson.databind.util.ClassUtil.name;
 
 @Service
 @RequiredArgsConstructor
@@ -37,7 +41,11 @@ public class TravelServiceImpl implements TravelService {
                 .user(User.builder()
                         .id(existingUser.getId())
                         .fullName(existingUser.getFullName())
+                        .address(existingUser.getAddress())
+                        .birthDate(LocalDate.parse(existingUser.getBirthDate()))
                         .phoneNumber(existingUser.getPhoneNumber())
+                        .gender(EGender.valueOf(existingUser.getGender()))
+                        .photoUrl(existingUser.getPhotoUrl())
                         .build())
                 .name(travelDto.getName())
                 .contactInfo(travelDto.getContactInfo())

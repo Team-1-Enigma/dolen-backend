@@ -26,7 +26,7 @@ import java.util.List;
 @Builder
 @Entity
 @Table(name = "m_user_credentials")
-public class UserCredential implements UserDetails {
+public class UserCredential {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -40,39 +40,13 @@ public class UserCredential implements UserDetails {
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;
 
+    @OneToOne
+    @JoinColumn(name = "verification_id")
+    private UserVerification verification;
+
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
     @Column(name = "password", nullable = false)
     private String password;
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role.getName().name()));
-    }
-
-    @Override
-    public String getUsername() {
-        return email;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
 }

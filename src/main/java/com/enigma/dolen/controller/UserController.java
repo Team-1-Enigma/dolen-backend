@@ -2,22 +2,16 @@ package com.enigma.dolen.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.enigma.dolen.model.dto.CommonResponse;
 import com.enigma.dolen.model.dto.UserDTO;
-import com.enigma.dolen.model.entity.User;
 import com.enigma.dolen.model.entity.UserCredential;
 import com.enigma.dolen.service.UserCredentialService;
 import com.enigma.dolen.service.UserService;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -30,34 +24,45 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<CommonResponse<?>> getUserById(@PathVariable String id) {
         UserDTO userDTO = userService.getUserById(id);
-        CommonResponse<UserDTO> response = CommonResponse.<UserDTO>builder()
+        return ResponseEntity.status(HttpStatus.OK).body(CommonResponse.<UserDTO>builder()
                 .message("User found")
                 .statusCode(HttpStatus.OK.value())
                 .data(userDTO)
-                .build();
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+                .build()
+        );
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<CommonResponse<?>> updateUser(@PathVariable String id, @RequestBody UserDTO userDTO) {
         UserDTO updatedUser = userService.updateUser(id, userDTO);
-        CommonResponse<UserDTO> response = CommonResponse.<UserDTO>builder()
+        return ResponseEntity.status(HttpStatus.OK).body(CommonResponse.<UserDTO>builder()
                 .message("User updated")
                 .statusCode(HttpStatus.OK.value())
                 .data(updatedUser)
-                .build();
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+                .build()
+        );
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<CommonResponse<?>> deleteUser(@PathVariable String id) {
         UserCredential userCredential = userCredentialService.findById(id);
         String data = userService.deleteUser(userCredential.getUser().getId());
-        CommonResponse<String> response = CommonResponse.<String>builder()
+        return ResponseEntity.status(HttpStatus.OK).body(CommonResponse.<String>builder()
                 .message("User deleted")
                 .statusCode(HttpStatus.OK.value())
                 .data(data)
-                .build();
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+                .build()
+        );
+    }
+
+    @PostMapping("/{id}/photo")
+    public ResponseEntity<CommonResponse<?>> uploadPhoto(@RequestParam("file") MultipartFile file, @PathVariable String id) {
+        String data = userService.uploadPhoto(file, id);
+        return ResponseEntity.status(HttpStatus.OK).body(CommonResponse.<String>builder()
+                .message("Photo uploaded")
+                .statusCode(HttpStatus.OK.value())
+                .data(data)
+                .build()
+        );
     }
 }
