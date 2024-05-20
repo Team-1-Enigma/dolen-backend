@@ -9,5 +9,5 @@ public interface AuthService {
 
     LoginResponse login(LoginRequest loginRequest);
 
-    RegisterResponse register(RegisterRequest registerRequest);
+    RegisterResponse register(RegisterRequest registerRequest, String url);
 }

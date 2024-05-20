@@ -2,11 +2,11 @@ package com.enigma.dolen.service;
 
 import java.util.Optional;
 
+import com.enigma.dolen.model.entity.AppUser;
 import com.enigma.dolen.model.entity.Role;
 import com.enigma.dolen.model.entity.User;
 import com.enigma.dolen.model.entity.UserCredential;
 import com.enigma.dolen.model.dto.RegisterRequest;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 public interface UserCredentialService extends UserDetailsService {
@@ -17,5 +17,5 @@ public interface UserCredentialService extends UserDetailsService {
 
     UserCredential findById(String id);
 
-    UserDetails loadUserById(String credentialId);
+    AppUser loadUserById(String credentialId);
 }

@@ -1,10 +1,13 @@
 package com.enigma.dolen.service.impl;
 
+import com.enigma.dolen.model.entity.*;
+import com.enigma.dolen.model.exception.ApplicationException;
 import com.enigma.dolen.security.JwtUtil;
+import com.enigma.dolen.service.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
@@ -14,13 +17,6 @@ import com.enigma.dolen.model.dto.LoginResponse;
 import com.enigma.dolen.model.dto.RegisterRequest;
 import com.enigma.dolen.model.dto.RegisterResponse;
 import com.enigma.dolen.model.dto.UserDTO;
-import com.enigma.dolen.model.entity.Role;
-import com.enigma.dolen.model.entity.User;
-import com.enigma.dolen.model.entity.UserCredential;
-import com.enigma.dolen.service.AuthService;
-import com.enigma.dolen.service.RoleService;
-import com.enigma.dolen.service.UserCredentialService;
-import com.enigma.dolen.service.UserService;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -32,27 +28,41 @@ public class AuthServiceImpl implements AuthService {
     private final UserService userService;
     private final RoleService roleService;
     private final UserCredentialService userCredentialService;
+    private final UserVerificationService userVerificationService;
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
 
     @Override
     public LoginResponse login(LoginRequest loginRequest) {
-        Authentication authentication = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
-        );
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                loginRequest.getEmail(),
+                loginRequest.getPassword()
+        ));
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        UserCredential userCredential = (UserCredential) authentication.getPrincipal();
-        String token = jwtUtil.generateToken(userCredential);
+        AppUser appUser = (AppUser) authentication.getPrincipal();
+        UserCredential userCredential = userCredentialService.findByEmail(appUser.getEmail())
+                .orElseThrow(() -> new ApplicationException("User not found", HttpStatus.NOT_FOUND));
+        UserVerification userVerification = userCredential.getVerification();
+        if (!userVerification.getIsVerified()) {
+            throw new ApplicationException("Email not verified", HttpStatus.UNAUTHORIZED);
+        }
+
+        String token = jwtUtil.generateToken(appUser);
 
         return LoginResponse.builder()
-                .credentialId(userCredential.getId())
                 .token(token)
+                .credentialId(appUser.getId())
+                .email(appUser.getEmail())
+                .role(String.valueOf(appUser.getRole()))
                 .build();
     }
 
     @Transactional(rollbackOn = Exception.class)
     @Override
-    public RegisterResponse register(RegisterRequest registerRequest) {
+    public RegisterResponse register(RegisterRequest registerRequest, String url) {
+        if (userCredentialService.findByEmail(registerRequest.getEmail()).isPresent()) {
+            throw new ApplicationException("Email already registered", HttpStatus.BAD_REQUEST);
+        }
         UserDTO userDTO = UserDTO.builder()
                 .fullName(registerRequest.getFullName())
                 .phoneNumber(registerRequest.getPhoneNumber())
@@ -60,6 +70,8 @@ public class AuthServiceImpl implements AuthService {
         User user = userService.createUser(userDTO);
         Role role = roleService.getOrSave(ERole.USER);
         UserCredential userCredential = userCredentialService.createCredential(registerRequest, user, role);
+        UserVerification userVerification = userVerificationService.createVerification(userCredential, url);
+        userCredential.setVerification(userVerification);
 
         return RegisterResponse.builder()
                 .credentialId(userCredential.getId())
