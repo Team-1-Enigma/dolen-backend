@@ -20,4 +20,7 @@ public class TravelResponse {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private Boolean isActive;
+
+    private BankAccountResponse bankAccountResponse;
+    private ImageTravelResponse imageTravelResponse;
 }

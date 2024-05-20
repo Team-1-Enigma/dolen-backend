@@ -18,7 +18,7 @@ public class ImageTravelController {
 
     @PostMapping
     public ResponseEntity<?> createImageTravel(@RequestBody ImageTravelDTO imageTravelDTO){
-        ImageTravelResponse imageTravelResponse = imageTravelService.createImageTravel(imageTravelDTO);
+        ImageTravelResponse imageTravelResponse = imageTravelService.addPhoto(imageTravelDTO);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(CommonResponse.builder()

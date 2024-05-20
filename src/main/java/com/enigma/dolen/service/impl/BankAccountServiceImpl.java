@@ -23,16 +23,16 @@ public class BankAccountServiceImpl implements BankAccountService {
 
     @Override
     @Transactional(rollbackOn = Exception.class)
-    public BankAccountResponse createBankAccount(BankAccountDTO bankAccountDTO) {
+    public BankAccountResponse createBankAccount(TravelDTO travelDTO, Travel travel) {
 
-        Travel travel = travelService.getTravelByIdForOther(bankAccountDTO.getTravelId());
+//        Travel travel = travelService.getTravelByIdForOther(bankAccountDTO.getTravelId());
 
         BankAccount bankAccount = BankAccount.builder()
                 .travel(travel)
-                .name(bankAccountDTO.getName())
-                .aliasName(bankAccountDTO.getAliasName())
-                .bankName(bankAccountDTO.getBankName())
-                .accountNumber(bankAccountDTO.getAccountNumber())
+                .name(travelDTO.getNameAccount())
+                .aliasName(travelDTO.getAliasName())
+                .bankName(travelDTO.getBankName())
+                .accountNumber(travelDTO.getAccountNumber())
                 .createdAt(LocalDateTime.now())
                 .isActive(true)
                 .build();

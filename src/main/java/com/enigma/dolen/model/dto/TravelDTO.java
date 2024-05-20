@@ -20,4 +20,11 @@ public class TravelDTO {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private Boolean isActive;
+
+    private String imageUrl;
+
+    private String nameAccount;
+    private String aliasName;
+    private String bankName;
+    private String accountNumber;
 }

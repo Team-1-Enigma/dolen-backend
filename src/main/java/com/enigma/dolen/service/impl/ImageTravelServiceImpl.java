@@ -22,9 +22,21 @@ public class ImageTravelServiceImpl implements ImageTravelService {
     private final TravelService travelService;
 
     @Override
-    @Transactional(rollbackOn = Exception.class)
-    public ImageTravelResponse createImageTravel(ImageTravelDTO imageTravelDTO) {
+    public ImageTravelResponse createImageTravel(TravelDTO travelDTO, Travel travel) {
 
+        ImageTravel imageTravel = ImageTravel.builder()
+                .travel(travel)
+                .imageUrl(travelDTO.getImageUrl())
+                .isActive(true)
+                .build();
+        imageTravelRepository.saveAndFlush(imageTravel);
+
+        return toImageTravelResponse(imageTravel);
+    }
+
+    @Override
+    @Transactional(rollbackOn = Exception.class)
+    public ImageTravelResponse addPhoto(ImageTravelDTO imageTravelDTO) {
         Travel travel = travelService.getTravelByIdForOther(imageTravelDTO.getTravelId());
 
         ImageTravel imageTravel = ImageTravel.builder()
