@@ -3,6 +3,7 @@ package com.enigma.dolen.service.impl;
 import com.enigma.dolen.constant.ERole;
 import com.enigma.dolen.model.dto.TravelDTO;
 import com.enigma.dolen.model.dto.TravelResponse;
+import com.enigma.dolen.model.dto.UserDTO;
 import com.enigma.dolen.model.entity.Travel;
 import com.enigma.dolen.model.entity.User;
 import com.enigma.dolen.repository.TravelRepository;
@@ -28,12 +29,16 @@ public class TravelServiceImpl implements TravelService {
     @Override
     @Transactional(rollbackOn = Exception.class)
     public TravelResponse createTravel(TravelDTO travelDto) {
-        User existingUser = userService.getUserById(travelDto.getUserId());
+        UserDTO existingUser = userService.getUserById(travelDto.getUserId());
 
         roleService.getOrSave(ERole.TRAVEL_OWNER);
 
         Travel travel = Travel.builder()
-                .user(existingUser)
+                .user(User.builder()
+                        .id(existingUser.getId())
+                        .fullName(existingUser.getFullName())
+                        .phoneNumber(existingUser.getPhoneNumber())
+                        .build())
                 .name(travelDto.getName())
                 .contactInfo(travelDto.getContactInfo())
                 .address(travelDto.getAddress())
