@@ -1,8 +1,10 @@
 package com.enigma.dolen.service.impl;
 
+import com.enigma.dolen.constant.EGender;
 import com.enigma.dolen.constant.ERole;
 import com.enigma.dolen.model.dto.TravelDTO;
 import com.enigma.dolen.model.dto.TravelResponse;
+import com.enigma.dolen.model.dto.UserDTO;
 import com.enigma.dolen.model.entity.Travel;
 import com.enigma.dolen.model.entity.User;
 import com.enigma.dolen.repository.TravelRepository;
@@ -13,9 +15,12 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.fasterxml.jackson.databind.util.ClassUtil.name;
 
 @Service
 @RequiredArgsConstructor
@@ -28,12 +33,20 @@ public class TravelServiceImpl implements TravelService {
     @Override
     @Transactional(rollbackOn = Exception.class)
     public TravelResponse createTravel(TravelDTO travelDto) {
-        User existingUser = userService.getUserById(travelDto.getUserId());
+        UserDTO existingUser = userService.getUserById(travelDto.getUserId());
 
         roleService.getOrSave(ERole.TRAVEL_OWNER);
 
         Travel travel = Travel.builder()
-                .user(existingUser)
+                .user(User.builder()
+                        .id(existingUser.getId())
+                        .fullName(existingUser.getFullName())
+                        .address(existingUser.getAddress())
+                        .birthDate(LocalDate.parse(existingUser.getBirthDate()))
+                        .phoneNumber(existingUser.getPhoneNumber())
+                        .gender(EGender.valueOf(existingUser.getGender()))
+                        .photoUrl(existingUser.getPhotoUrl())
+                        .build())
                 .name(travelDto.getName())
                 .contactInfo(travelDto.getContactInfo())
                 .address(travelDto.getAddress())
