@@ -19,27 +19,34 @@ import java.util.Map;
 @Component
 @RequiredArgsConstructor
 public class AuthTokenFilter extends OncePerRequestFilter {
+
     private final JwtUtil jwtUtil;
     private final UserCredentialService userCredentialService;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        try {
-            String headerAuth = request.getHeader("Authorization");
-            String token = null;
-            if (headerAuth != null && headerAuth.startsWith("Bearer ")) {
-                token = headerAuth.substring(7);
-            }
-            if (token != null && jwtUtil.verifyJwtToken(token)) {
-                Map<String, String> userInfo = jwtUtil.getUserInfoByToken(token);
-                UserDetails user = userCredentialService.loadUserById(userInfo.get("credentialId"));
-                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-                authenticationToken.setDetails(new WebAuthenticationDetailsSource());
-                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-            }
-        } catch (Exception e) {
-            e.getMessage();
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
+        String token = extractToken(request);
+        if (token != null && jwtUtil.verifyJwtToken(token)) {
+            authenticateUser(token, request);
         }
         filterChain.doFilter(request, response);
+    }
+
+    private String extractToken(HttpServletRequest request) {
+        String headerAuth = request.getHeader("Authorization");
+        if (headerAuth != null && headerAuth.startsWith("Bearer ")) {
+            return headerAuth.substring(7);
+        }
+        return null;
+    }
+
+    private void authenticateUser(String token, HttpServletRequest request) {
+        Map<String, String> userInfo = jwtUtil.getUserInfoByToken(token);
+        UserDetails user = userCredentialService.loadUserById(userInfo.get("credentialId"));
+        UsernamePasswordAuthenticationToken authenticationToken =
+                new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+        authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
     }
 }
