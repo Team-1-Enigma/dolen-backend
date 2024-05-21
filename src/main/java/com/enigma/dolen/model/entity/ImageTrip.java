@@ -26,5 +26,5 @@ public class ImageTrip {
     private String imageUrl;
 
     @Column(name = "is_active", nullable = false)
-    private boolean isActive;
+    private Boolean isActive;
 }
