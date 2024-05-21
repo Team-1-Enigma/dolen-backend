@@ -1,16 +1,16 @@
 package com.enigma.dolen.service;
 
-import com.enigma.dolen.model.dto.TravelDTO;
-import com.enigma.dolen.model.dto.TravelResponse;
+import com.enigma.dolen.model.dto.*;
 import com.enigma.dolen.model.entity.Travel;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 public interface TravelService {
-    TravelResponse createTravel(TravelDTO travelDto);
+    TravelCreateResponse createTravel(TravelRequest travelRequest);
     Travel getTravelByIdForOther(String id);
-    TravelResponse getTravelById(String id);
-    List<TravelResponse> getAllTravel();
-    TravelResponse updateTravel(TravelDTO travelDto);
-    TravelResponse deleteTravel(String id);
+    TravelCreateResponse getTravelById(String id);
+    List<TravelCreateResponse> getAllTravel();
+    TravelResponse updateTravel(String travelId, TravelDTO travelDTO);
+    String deleteTravel(String id);
 }
