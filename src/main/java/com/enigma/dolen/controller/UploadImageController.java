@@ -23,6 +23,7 @@ public class UploadImageController {
                 .statusCode(HttpStatus.OK.value())
                 .data(imageUrl)
                 .build()
+
         );
     }
 }

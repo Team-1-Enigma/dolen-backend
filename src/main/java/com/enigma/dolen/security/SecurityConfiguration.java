@@ -25,6 +25,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfiguration {
 
     private static final String[] WHITE_LIST_URL = {
+        "/api/image",
         "/api/auth/login",
         "/api/auth/register",
         "/api/verify",
