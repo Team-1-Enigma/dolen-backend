@@ -1,11 +1,14 @@
 package com.enigma.dolen.service;
 
-import com.enigma.dolen.model.dto.ImageTravelDTO;
-import com.enigma.dolen.model.dto.ImageTravelResponse;
-import com.enigma.dolen.model.entity.ImageTravel;
+import com.enigma.dolen.model.dto.*;
+import com.enigma.dolen.model.entity.Travel;
+
+import java.util.List;
 
 public interface ImageTravelService {
-    ImageTravelResponse createImageTravel(ImageTravelDTO imageTravelDTO);
+    List<ImageTravelResponse> createImageTravel(Travel travel, TravelRequest travelRequest);
+    List<ImageTravelResponse> addPhoto(AddPhotoRequest addPhotoRequest);
+    List<ImageTravelResponse> getAllPhotoByTravelId(String travelId);
     ImageTravelResponse getImageTravelById(String id);
     ImageTravelResponse deleteImageTravel(String id);
 }

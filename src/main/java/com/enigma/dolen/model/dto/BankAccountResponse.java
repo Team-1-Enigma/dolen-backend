@@ -21,5 +21,4 @@ public class BankAccountResponse {
     private LocalDateTime updatedAt;
     private Boolean isActive;
 
-    private TravelDTO travelDTO;
 }

@@ -1,7 +1,7 @@
 package com.enigma.dolen.controller;
 
+import com.enigma.dolen.model.dto.AddPhotoRequest;
 import com.enigma.dolen.model.dto.CommonResponse;
-import com.enigma.dolen.model.dto.ImageTravelDTO;
 import com.enigma.dolen.model.dto.ImageTravelResponse;
 import com.enigma.dolen.service.ImageTravelService;
 import lombok.RequiredArgsConstructor;
@@ -9,40 +9,42 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/travel/image")
+@RequestMapping("/api/travel/image")
 public class ImageTravelController {
 
     private final ImageTravelService imageTravelService;
 
-    @PostMapping
-    public ResponseEntity<?> createImageTravel(@RequestBody ImageTravelDTO imageTravelDTO){
-        ImageTravelResponse imageTravelResponse = imageTravelService.createImageTravel(imageTravelDTO);
+    @PostMapping("/{travel_id}")
+    public ResponseEntity<?> addImageTravel(@ModelAttribute AddPhotoRequest request){
+        List<ImageTravelResponse> imageTravelResponses = imageTravelService.addPhoto(request);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(CommonResponse.builder()
-                        .message("Image travel created")
+                        .message("Image travel added successfully")
                         .statusCode(HttpStatus.CREATED.value())
-                        .data(imageTravelResponse)
+                        .data(imageTravelResponses)
                         .build());
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getImageTravelById(@PathVariable String id){
-        ImageTravelResponse imageTravelResponse = imageTravelService.getImageTravelById(id);
+    @GetMapping("/{travel_id}")
+    public ResponseEntity<?> getImageByTravelId(@PathVariable String travel_id){
+        List<ImageTravelResponse> imageUrls = imageTravelService.getAllPhotoByTravelId(travel_id);
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(CommonResponse.builder()
-                        .message("Image travel found")
+                        .message("All image by travel id found successfully")
                         .statusCode(HttpStatus.OK.value())
-                        .data(imageTravelResponse)
+                        .data(imageUrls)
                         .build());
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteImageTravel(@PathVariable String id){
-        imageTravelService.deleteImageTravel(id);
+    @DeleteMapping("/{image_id}")
+    public ResponseEntity<?> deleteImageTravel(@PathVariable String image_id){
+        imageTravelService.deleteImageTravel(image_id);
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(CommonResponse.builder()

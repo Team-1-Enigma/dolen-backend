@@ -6,18 +6,22 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
+@Builder(toBuilder = true)
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-public class BankAccountDTO {
+public class TravelCreateResponse {
     private String id;
+    private String userId;
     private String name;
-    private String aliasName;
-    private String bankName;
-    private String accountNumber;
+    private String contactInfo;
+    private String address;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private Boolean isActive;
+
+    private List<BankAccountResponse> bankAccountResponseList;
+    private List<ImageTravelResponse> imageTravelResponseList;
 }

@@ -29,6 +29,8 @@ public class SecurityConfiguration {
         "/api/auth/register",
         "/api/user/verify",
         "/verify",
+            "/**",
+            "/api/travels",
     };
 
     @Bean
