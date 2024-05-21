@@ -49,4 +49,7 @@ public class Travel {
 
     @OneToMany(mappedBy = "travel")
     private List<Feedback> feedbacks;
+
+    @OneToMany(mappedBy = "travel")
+    private List<Trip> trips;
 }
