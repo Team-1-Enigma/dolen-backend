@@ -1,40 +1,43 @@
 package com.enigma.dolen.controller;
 
-import com.enigma.dolen.model.dto.CommonResponse;
-import com.enigma.dolen.model.dto.TravelDTO;
-import com.enigma.dolen.model.dto.TravelResponse;
+import com.enigma.dolen.model.dto.*;
 import com.enigma.dolen.model.entity.Travel;
+import com.enigma.dolen.service.BankAccountService;
 import com.enigma.dolen.service.TravelService;
+import com.enigma.dolen.service.UploadImageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/travel")
+@RequestMapping("api/travels")
 public class TravelController {
 
     private final TravelService travelService;
+    private final BankAccountService bankAccountService;
 
     @PostMapping
-    public ResponseEntity<?> createTravel(@RequestBody TravelDTO travelDTO){
-        TravelResponse travelResponse = travelService.createTravel(travelDTO);
+    public ResponseEntity<?> createTravel(@ModelAttribute TravelRequest travelRequest){
+
+        TravelCreateResponse travelCreateResponse = travelService.createTravel(travelRequest);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(CommonResponse.builder()
                         .message("Travel created")
                         .statusCode(HttpStatus.CREATED.value())
-                        .data(travelResponse)
+                        .data(travelCreateResponse)
                         .build());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getTravelById(@PathVariable String id){
-        TravelResponse travelResponse = travelService.getTravelById(id);
+        TravelCreateResponse travelResponse = travelService.getTravelById(id);
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(CommonResponse.builder()
@@ -46,7 +49,7 @@ public class TravelController {
 
     @GetMapping
     public ResponseEntity<?> getAllTravel(){
-        List<TravelResponse> travelResponses = travelService.getAllTravel();
+        List<TravelCreateResponse> travelResponses = travelService.getAllTravel();
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(CommonResponse.builder()
@@ -56,9 +59,9 @@ public class TravelController {
                         .build());
     }
 
-    @PutMapping
-    public ResponseEntity<?> updateTravel(@RequestBody TravelDTO travelDTO){
-        TravelResponse travelResponse = travelService.updateTravel(travelDTO);
+    @PutMapping("/update/{id}")
+    public ResponseEntity<?> updateTravel(@PathVariable String id, @RequestBody TravelDTO travelDTO){
+        TravelResponse travelResponse = travelService.updateTravel(id, travelDTO);
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(CommonResponse.builder()
@@ -68,14 +71,63 @@ public class TravelController {
                         .build());
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteTravel(@PathVariable String id){
-        travelService.deleteTravel(id);
+        String data = travelService.deleteTravel(id);
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(CommonResponse.builder()
                         .message("Travel deleted")
                         .statusCode(HttpStatus.OK.value())
+                        .data(data)
                         .build());
+    }
+
+    @PostMapping("/{id}/bank_account")
+    public ResponseEntity<?> createBankAccount(@PathVariable String id, @RequestBody AddBankAccountRequest request){
+        List<BankAccountResponse> bankAccountResponses = bankAccountService.addBankAccount(id, request);
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(CommonResponse.builder()
+                        .message("Bank account successfully added")
+                        .statusCode(HttpStatus.CREATED.value())
+                        .data(bankAccountResponses)
+                        .build());
+    }
+
+    @PutMapping("/{id}/bank_account/{account_id}")
+    public ResponseEntity<?> updateBankAccount(@PathVariable String id, @PathVariable String account_id, @RequestBody BankAccountDTO bankAccountDTO){
+        BankAccountResponse bankAccountResponse = bankAccountService.updateBankAccount(id, account_id, bankAccountDTO);
+
+        return ResponseEntity.status(HttpStatus.OK)
+               .body(CommonResponse.builder()
+                       .message("Bank account updated")
+                       .statusCode(HttpStatus.OK.value())
+                       .data(bankAccountResponse)
+                       .build());
+    }
+
+    @GetMapping("/{id}/bank_account")
+    public ResponseEntity<?> getBankAccountByTravelId(@PathVariable String id){
+        List<BankAccountResponse> bankAccountResponses = bankAccountService.getAllBankAccountByTravelId(id);
+
+        return ResponseEntity.status(HttpStatus.OK)
+               .body(CommonResponse.builder()
+                       .message("Bank account found")
+                       .statusCode(HttpStatus.OK.value())
+                       .data(bankAccountResponses)
+                       .build());
+    }
+
+    @DeleteMapping("/{id}/bank_account/{account_id}")
+    public ResponseEntity<?> deleteBankAccount(@PathVariable String id, @PathVariable String account_id){
+        BankAccountResponse bankAccountResponse = bankAccountService.deleteBankAccount(id, account_id);
+
+        return ResponseEntity.status(HttpStatus.OK)
+               .body(CommonResponse.builder()
+                       .message("Bank account deleted")
+                       .statusCode(HttpStatus.OK.value())
+                       .data(bankAccountResponse)
+                       .build());
     }
 }

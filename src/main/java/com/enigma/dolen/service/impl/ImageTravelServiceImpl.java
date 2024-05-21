@@ -1,65 +1,108 @@
 package com.enigma.dolen.service.impl;
 
-import com.enigma.dolen.model.dto.FeedbackResponse;
-import com.enigma.dolen.model.dto.ImageTravelDTO;
-import com.enigma.dolen.model.dto.ImageTravelResponse;
-import com.enigma.dolen.model.dto.TravelDTO;
+import com.enigma.dolen.model.dto.*;
 import com.enigma.dolen.model.entity.Feedback;
 import com.enigma.dolen.model.entity.ImageTravel;
 import com.enigma.dolen.model.entity.Travel;
 import com.enigma.dolen.repository.ImageTravelRepository;
 import com.enigma.dolen.service.ImageTravelService;
 import com.enigma.dolen.service.TravelService;
+import com.enigma.dolen.service.UploadImageService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class ImageTravelServiceImpl implements ImageTravelService {
 
     private final ImageTravelRepository imageTravelRepository;
-    private final TravelService travelService;
+    private final UploadImageService uploadImageService;
+    private TravelService travelService;
+
+    @Autowired
+    @Lazy
+    public void setTravelService(TravelService travelService) {
+        this.travelService = travelService;
+    }
+
 
     @Override
-    public ImageTravelResponse createImageTravel(TravelDTO travelDTO, Travel travel) {
+    public List<ImageTravelResponse> createImageTravel(Travel travel, TravelRequest travelRequest) {
 
-        ImageTravel imageTravel = ImageTravel.builder()
-                .travel(travel)
-                .imageUrl(travelDTO.getImageUrl())
-                .isActive(true)
-                .build();
-        imageTravelRepository.saveAndFlush(imageTravel);
+        Travel existingTravel = travelService.getTravelByIdForOther(travel.getId());
 
-        return toImageTravelResponse(imageTravel);
+        List<ImageTravelResponse> imageTravelUrls = new ArrayList<>();
+        for(MultipartFile file : travelRequest.getFiles()) {
+            String imageUrl = uploadImageService.uploadImage(file);
+
+            ImageTravel imageTravel = ImageTravel.builder()
+                    .travel(existingTravel)
+                    .imageUrl(imageUrl)
+                    .isActive(true)
+                    .build();
+            imageTravelRepository.saveAndFlush(imageTravel);
+
+            imageTravelUrls.add(toImageTravelResponse(imageTravel));
+        }
+
+
+        return imageTravelUrls;
     }
 
     @Override
     @Transactional(rollbackOn = Exception.class)
-    public ImageTravelResponse addPhoto(ImageTravelDTO imageTravelDTO) {
-        Travel travel = travelService.getTravelByIdForOther(imageTravelDTO.getTravelId());
+    public List<ImageTravelResponse> addPhoto(AddPhotoRequest request) {
+        Travel travel = travelService.getTravelByIdForOther(request.getTravel_id());
 
-        ImageTravel imageTravel = ImageTravel.builder()
-                .travel(travel)
-                .imageUrl(imageTravelDTO.getImageUrl())
-                .isActive(true)
-                .build();
-        imageTravelRepository.saveAndFlush(imageTravel);
+        List<ImageTravelResponse> imageTravelResponses = new ArrayList<>();
+        for(MultipartFile file : request.getFiles()) {
+            String imageUrl = uploadImageService.uploadImage(file);
 
-        return toImageTravelResponse(imageTravel);
+            ImageTravel imageTravel = ImageTravel.builder()
+                    .travel(travel)
+                    .imageUrl(imageUrl)
+                    .isActive(true)
+                    .build();
+            imageTravelRepository.saveAndFlush(imageTravel);
+
+            imageTravelResponses.add(toImageTravelResponse(imageTravel));
+        }
+
+
+        return imageTravelResponses;
     }
+
+    @Override
+    public List<ImageTravelResponse> getAllPhotoByTravelId(String travelId) {
+        Travel travel = travelService.getTravelByIdForOther(travelId);
+        if (travel == null){
+            return null;
+        }
+        List<ImageTravelResponse> travelUrls = travel.getImageTravels().stream()
+                .filter(image -> image.getIsActive())
+                .map(imageTravel -> ImageTravelResponse.builder()
+                        .id(imageTravel.getId())
+                        .imageUrl(imageTravel.getImageUrl())
+                        .isActive(imageTravel.getIsActive())
+                        .build())
+                .toList();
+
+        return travelUrls;
+    }
+
 
     private static ImageTravelResponse toImageTravelResponse(ImageTravel imageTravel) {
         ImageTravelResponse imageTravelResponse = ImageTravelResponse.builder()
                 .id(imageTravel.getId())
-                .travelDTO(TravelDTO.builder()
-                        .id(imageTravel.getTravel().getId())
-                        .userId(imageTravel.getTravel().getUser().getId())
-                        .name(imageTravel.getTravel().getName())
-                        .contactInfo(imageTravel.getTravel().getContactInfo())
-                        .address(imageTravel.getTravel().getAddress())
-                        .build())
                 .imageUrl(imageTravel.getImageUrl())
+                .isActive(imageTravel.getIsActive())
                 .build();
         return imageTravelResponse;
     }

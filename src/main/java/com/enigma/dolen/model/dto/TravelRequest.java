@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -12,7 +13,7 @@ import java.util.List;
 @Builder(toBuilder = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class TravelDTO {
+public class TravelRequest {
     private String id;
     private String userId;
     private String name;
@@ -22,5 +23,12 @@ public class TravelDTO {
     private LocalDateTime updatedAt;
     private Boolean isActive;
 
-    private List<String> imageTravelUrls;
+    private String imageUrl;
+
+    private String nameAccount;
+    private String aliasName;
+    private String bankName;
+    private String accountNumber;
+
+    private List<MultipartFile> files;
 }

@@ -2,23 +2,26 @@ package com.enigma.dolen.service.impl;
 
 import com.enigma.dolen.constant.EGender;
 import com.enigma.dolen.constant.ERole;
-import com.enigma.dolen.model.dto.BankAccountResponse;
-import com.enigma.dolen.model.dto.ImageTravelResponse;
-import com.enigma.dolen.model.dto.TravelDTO;
-import com.enigma.dolen.model.dto.TravelResponse;
-import com.enigma.dolen.model.dto.UserDTO;
+import com.enigma.dolen.model.dto.*;
+import com.enigma.dolen.model.entity.BankAccount;
+import com.enigma.dolen.model.entity.ImageTravel;
 import com.enigma.dolen.model.entity.Travel;
 import com.enigma.dolen.model.entity.User;
 import com.enigma.dolen.repository.TravelRepository;
 import com.enigma.dolen.service.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.OptionalDouble;
 import java.util.stream.Collectors;
 
 import static com.fasterxml.jackson.databind.util.ClassUtil.name;
@@ -30,13 +33,29 @@ public class TravelServiceImpl implements TravelService {
     private final TravelRepository travelRepository;
     private final RoleService roleService;
     private final UserService userService;
-    private final ImageTravelService imageTravelService;
-    private final BankAccountService bankAccountService;
+
+    @Lazy
+    private ImageTravelService imageTravelService;
+
+    @Lazy
+    private BankAccountService bankAccountService;
+
+    @Autowired
+    @Lazy
+    public void setImageTravelService(ImageTravelService imageTravelService) {
+        this.imageTravelService = imageTravelService;
+    }
+
+    @Autowired
+    @Lazy
+    public void setBankAccountService(BankAccountService bankAccountService) {
+        this.bankAccountService = bankAccountService;
+    }
 
     @Override
     @Transactional(rollbackOn = Exception.class)
-    public TravelResponse createTravel(TravelDTO travelDto) {
-        UserDTO existingUser = userService.getUserById(travelDto.getUserId());
+    public TravelCreateResponse createTravel(TravelRequest travelRequest) {
+        UserDTO existingUser = userService.getUserById(travelRequest.getUserId());
 
         roleService.getOrSave(ERole.TRAVEL_OWNER);
 
@@ -45,34 +64,44 @@ public class TravelServiceImpl implements TravelService {
                         .id(existingUser.getId())
                         .fullName(existingUser.getFullName())
                         .address(existingUser.getAddress())
-                        .birthDate(LocalDate.parse(existingUser.getBirthDate()))
+                        .birthDate(Optional.ofNullable(existingUser.getBirthDate()).map(LocalDate::parse)
+                        .orElse(null))
                         .phoneNumber(existingUser.getPhoneNumber())
-                        .gender(EGender.valueOf(existingUser.getGender()))
+                        .gender(Optional.ofNullable(existingUser.getGender()).map(EGender::valueOf).orElse(null))
                         .photoUrl(existingUser.getPhotoUrl())
                         .build())
-                .name(travelDto.getName())
-                .contactInfo(travelDto.getContactInfo())
-                .address(travelDto.getAddress())
+                .name(travelRequest.getName())
+                .contactInfo(travelRequest.getContactInfo())
+                .address(travelRequest.getAddress())
                 .createdAt(LocalDateTime.now())
                 .isActive(true)
                 .build();
         travelRepository.saveAndFlush(travel);
 
-        ImageTravelResponse imageTravelResponse = imageTravelService.createImageTravel(travelDto, travel);
-        BankAccountResponse bankAccountResponse = bankAccountService.createBankAccount(travelDto, travel);
 
-        return toTravelResponse(travel, imageTravelResponse, bankAccountResponse);
+        List<ImageTravelResponse> imageTravelResponses = imageTravelService.createImageTravel(travel, travelRequest);
+        BankAccountResponse bankAccountResponse = bankAccountService.createBankAccount(travel, travelRequest);
+
+        return TravelCreateResponse.builder()
+                .id(travel.getId())
+                .userId(travel.getUser().getId())
+                .name(travel.getName())
+                .contactInfo(travel.getContactInfo())
+                .address(travel.getAddress())
+                .createdAt(travel.getCreatedAt())
+                .isActive(travel.getIsActive())
+                .bankAccountResponseList((List.of(bankAccountResponse)))
+                .imageTravelResponseList(imageTravelResponses)
+                .build();
     }
 
-    private static TravelResponse toTravelResponse(Travel travel, ImageTravelResponse imageTravelResponse, BankAccountResponse bankAccountResponse) {
+    private static TravelResponse toTravelResponse(Travel travel) {
         return TravelResponse.builder()
                 .id(travel.getId())
                 .userId(travel.getUser().getId())
                 .name(travel.getName())
                 .contactInfo(travel.getContactInfo())
                 .address(travel.getAddress())
-                .bankAccountResponse(bankAccountResponse)
-                .imageTravelResponse(imageTravelResponse)
                 .build();
     }
 
@@ -82,46 +111,116 @@ public class TravelServiceImpl implements TravelService {
     }
 
     @Override
-    public TravelResponse getTravelById(String id) {
+    public TravelCreateResponse getTravelById(String id) {
         Travel travel = travelRepository.findById(id).orElse(null);
-        return toTravelResponse(travel, null, null);
+
+        List<BankAccountResponse> bankAccountResponseList = travel.getBankAccounts().stream().map(
+                bankAccount -> BankAccountResponse.builder()
+                       .id(bankAccount.getId())
+                       .bankName(bankAccount.getBankName())
+                        .accountNumber(bankAccount.getAccountNumber())
+                        .aliasName(bankAccount.getAliasName())
+                        .isActive(bankAccount.getIsActive())
+                        .createdAt(bankAccount.getCreatedAt())
+                       .build()
+        ).toList();
+
+        List<ImageTravelResponse> imageTravelResponseList = travel.getImageTravels().stream().map(
+                imageTravel -> ImageTravelResponse.builder()
+                       .id(imageTravel.getId())
+                       .imageUrl(imageTravel.getImageUrl())
+                        .isActive(imageTravel.getIsActive())
+                        .build()
+                ).toList();
+
+        return TravelCreateResponse.builder()
+                .id(travel.getId())
+                .userId(travel.getUser().getId())
+                .name(travel.getName())
+                .contactInfo(travel.getContactInfo())
+                .address(travel.getAddress())
+                .isActive(travel.getIsActive())
+                .createdAt(travel.getCreatedAt())
+                .bankAccountResponseList(bankAccountResponseList)
+                .imageTravelResponseList(imageTravelResponseList)
+                .build();
     }
 
 
     @Override
-    public List<TravelResponse> getAllTravel() {
+    public List<TravelCreateResponse> getAllTravel() {
+        List<TravelCreateResponse> travelCreateResponses = new ArrayList<>();
         List<Travel> travels = travelRepository.findAll();
 
-        return travels.stream()
-                .map(travel -> toTravelResponse(travel,null,null))
-                .collect(Collectors.toList());
+        for(Travel travel : travels ){
+            if(travel.getIsActive() == true){
+                List<ImageTravelResponse> imageTravels = travel.getImageTravels().stream()
+                        .filter(imageTravel -> imageTravel.getIsActive())
+                        .map(imageTravel -> ImageTravelResponse.builder()
+                                .id(imageTravel.getId())
+                                .imageUrl(imageTravel.getImageUrl())
+                                .isActive(imageTravel.getIsActive())
+                                .build())
+                        .toList();
+
+
+                List<BankAccountResponse> bankAccounts = travel.getBankAccounts().stream()
+                        .filter(bankAccount -> bankAccount.getIsActive())
+                        .map(bankAccount -> BankAccountResponse.builder()
+                                .id(bankAccount.getId())
+                                .name(bankAccount.getName())
+                                .bankName(bankAccount.getBankName())
+                                .accountNumber(bankAccount.getAccountNumber())
+                                .aliasName(bankAccount.getAliasName())
+                                .isActive(bankAccount.getIsActive())
+                                .createdAt(bankAccount.getCreatedAt())
+                                .build())
+                        .toList();
+
+                TravelCreateResponse travelCreateResponse = TravelCreateResponse.builder()
+                        .id(travel.getId())
+                        .userId(travel.getUser().getId())
+                        .name(travel.getName())
+                        .contactInfo(travel.getContactInfo())
+                        .address(travel.getAddress())
+                        .isActive(travel.getIsActive())
+                        .createdAt(travel.getCreatedAt())
+                        .updatedAt(travel.getUpdatedAt())
+                        .bankAccountResponseList(bankAccounts)
+                        .imageTravelResponseList(imageTravels)
+                        .build();
+                travelCreateResponses.add(travelCreateResponse);
+            }
+        }
+
+        return travelCreateResponses;
     }
 
     @Override
     @Transactional(rollbackOn = Exception.class)
-    public TravelResponse updateTravel(TravelDTO travelDto) {
-        Travel existingTravel = travelRepository.findById(travelDto.getId()).orElse(null);
+    public TravelResponse updateTravel(String travelId, TravelDTO travelDTO) {
+        Travel existingTravel = travelRepository.findById(travelId).orElse(null);
         if (existingTravel == null) {
             return null;
         }
         Travel saveTravel = Travel.builder()
                 .id(existingTravel.getId())
                 .user(existingTravel.getUser())
-                .name(travelDto.getName())
-                .contactInfo(travelDto.getContactInfo())
-                .address(travelDto.getAddress())
+                .name(travelDTO.getName())
+                .contactInfo(travelDTO.getContactInfo())
+                .address(travelDTO.getAddress())
                 .createdAt(existingTravel.getCreatedAt())
                 .updatedAt(LocalDateTime.now())
                 .isActive(existingTravel.getIsActive())
                 .build();
         travelRepository.save(saveTravel);
 
-        return toTravelResponse(saveTravel, null,null);
+        return toTravelResponse(saveTravel);
     }
 
     @Override
     @Transactional(rollbackOn = Exception.class)
-    public TravelResponse deleteTravel(String id) {
+    public String deleteTravel(String id) {
         Travel travelToDelete = travelRepository.findById(id).orElse(null);
         if (travelToDelete == null){
             return null;
@@ -140,11 +239,11 @@ public class TravelServiceImpl implements TravelService {
         List<BankAccountResponse> bankAccountResponses = new ArrayList<>();
         if (travelToDelete.getBankAccounts() != null) {
             travelToDelete.getBankAccounts().forEach(bankAccount -> {
-                BankAccountResponse response = bankAccountService.deleteBankAccount(bankAccount.getId());
+                BankAccountResponse response = bankAccountService.deleteBankAccountForTravel(bankAccount.getId());
                 bankAccountResponses.add(response);
             });
         }
 
-        return toTravelResponse(travelToDelete, null, null);
+        return travelToDelete.getId();
     }
 }
