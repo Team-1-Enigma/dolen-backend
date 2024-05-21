@@ -23,7 +23,7 @@ public class UploadImageServiceImpl implements UploadImageService {
     @Override
     public String uploadImage(MultipartFile file) {
         try {
-            String fileName = "user-images/" + System.currentTimeMillis();
+            String fileName = "user-images/" + System.currentTimeMillis() + "-" + file.getOriginalFilename();
             s3Client.putObject(builder -> builder.bucket(bucketName).key(fileName).build(),
                     RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
             return s3Client.utilities().getUrl(builder -> builder.bucket(bucketName).key(fileName)).toExternalForm();
