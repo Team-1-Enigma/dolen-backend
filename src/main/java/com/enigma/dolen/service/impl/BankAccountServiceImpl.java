@@ -32,22 +32,28 @@ public class BankAccountServiceImpl implements BankAccountService {
 
     @Override
     @Transactional(rollbackOn = Exception.class)
-    public BankAccountResponse createBankAccount(Travel travel, TravelRequest travelRequest) {
+    public List<BankAccountResponse> createBankAccount(Travel travel, TravelRequest travelRequest) {
 
         Travel existingTravel = travelService.getTravelByIdForOther(travel.getId());
 
-        BankAccount bankAccount = BankAccount.builder()
-                .travel(existingTravel)
-                .name(travelRequest.getNameAccount())
-                .aliasName(travelRequest.getAliasName())
-                .bankName(travelRequest.getBankName())
-                .accountNumber(travelRequest.getAccountNumber())
-                .createdAt(LocalDateTime.now())
-                .isActive(true)
-                .build();
-        bankAccountRepository.saveAndFlush(bankAccount);
+        List<BankAccountResponse> result = new ArrayList<>();
+        for(BankAccount value : travelRequest.getBankAccounts()){
+            BankAccount bankAccount = BankAccount.builder()
+                    .travel(existingTravel)
+                    .name(value.getName())
+                    .aliasName(value.getAliasName())
+                    .bankName(value.getBankName())
+                    .accountNumber(value.getAccountNumber())
+                    .createdAt(LocalDateTime.now())
+                    .isActive(true)
+                    .build();
+            bankAccountRepository.saveAndFlush(bankAccount);
 
-        return toBankAccountResponse(bankAccount);
+            result.add(toBankAccountResponse(bankAccount));
+        }
+
+
+        return result;
     }
 
     @Override

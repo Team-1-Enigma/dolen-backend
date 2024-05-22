@@ -32,4 +32,5 @@ public class ItineraryDetail {
 
         @Column(name = "activity_desc", nullable = false)
         private String activityDesc;
+
 }

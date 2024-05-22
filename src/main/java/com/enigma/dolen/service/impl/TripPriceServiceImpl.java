@@ -57,15 +57,19 @@ public class TripPriceServiceImpl implements TripPriceService {
     }
 
     @Override
-    public List<TripPriceResponse> getTripPricebyTripId(String tripId) {
+    public List<TripPriceResponse> getTripPriceByTripId(String tripId) {
         Trip existingTrip = tripService.getTripByIdForOther(tripId);
         if (existingTrip == null){
             return null;
         }
+        if (existingTrip.getTripPrices().isEmpty()){
+            return null;
+        }
+
 
         List<TripPriceResponse> tripPriceResponses = existingTrip.getTripPrices().stream()
                 .sorted(Comparator.comparing(TripPrice::getCreatedAt).reversed())
-                .limit(2)
+                .limit(1)
                .map(tripPrice -> toTripPriceResponse(tripPrice)).toList();
 
         return tripPriceResponses;
@@ -77,11 +81,26 @@ public class TripPriceServiceImpl implements TripPriceService {
         if(existingTrip == null){
             return null;
         }
+        if (existingTrip.getTripPrices().isEmpty()){
+            return null;
+        }
+        if(existingTrip.getTripPrices().size() == 1){
+            return TripPriceDiscountResponse.builder()
+                    .tripId(existingTrip.getId())
+                    .priceBefore(existingTrip.getTripPrices().get(0).getPrice())
+                    .build();
+        }
+
         List<TripPrice> tripPrices = existingTrip.getTripPrices().stream()
                 .sorted(Comparator.comparing(TripPrice::getCreatedAt).reversed())
                 .limit(2).toList();
 
-        Integer discount = Math.toIntExact((tripPrices.get(0).getPrice() - tripPrices.get(1).getPrice()) / tripPrices.get(0).getPrice());
+        Integer discount = 0;
+        if (tripPrices.get(0).getPrice() > tripPrices.get(1).getPrice()){
+            discount = Math.toIntExact((tripPrices.get(0).getPrice() - tripPrices.get(1).getPrice()) / tripPrices.get(0).getPrice());
+        } else if(tripPrices.get(1).getPrice() > tripPrices.get(0).getPrice()) {
+            discount = Math.toIntExact((tripPrices.get(1).getPrice() - tripPrices.get(0).getPrice()) / tripPrices.get(1).getPrice());
+        }
 
         return TripPriceDiscountResponse.builder()
                 .tripId(existingTrip.getId())
@@ -89,5 +108,16 @@ public class TripPriceServiceImpl implements TripPriceService {
                 .priceAfter(tripPrices.get(0).getPrice())
                 .discount(discount)
                 .build();
+    }
+
+    @Override
+    public TripPriceResponse deleteTripPrice(String tripPriceId) {
+        TripPrice existingTripPrice = tripPriceRepository.findById(tripPriceId).orElse(null);
+        if (existingTripPrice == null) {
+            return null;
+        }
+        existingTripPrice.setIsActive(false);
+        tripPriceRepository.saveAndFlush(existingTripPrice);
+        return toTripPriceResponse(existingTripPrice);
     }
 }

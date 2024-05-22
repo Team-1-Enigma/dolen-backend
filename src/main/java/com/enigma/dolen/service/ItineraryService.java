@@ -1,15 +1,23 @@
 package com.enigma.dolen.service;
 
 import com.enigma.dolen.model.dto.ItineraryDTO;
+import com.enigma.dolen.model.dto.TripRequest;
+import com.enigma.dolen.model.entity.Itinerary;
 import com.enigma.dolen.model.entity.Trip;
+
+import java.util.List;
 
 public interface ItineraryService {
 
-    ItineraryDTO create(ItineraryDTO itineraryDTO);
+    List<ItineraryDTO> create(Trip trip, TripRequest tripRequest);
 
-    ItineraryDTO findById(String id);
+    ItineraryDTO addItinerary(ItineraryDTO itineraryDTO);
 
-    ItineraryDTO update(Integer day, String description);
+    Itinerary findById(String id);
+
+    List<ItineraryDTO> getAllItineraryByTripId(String tripId);
+
+    ItineraryDTO update(String id, ItineraryDTO itineraryDTO);
 
     String delete(String id);
 }

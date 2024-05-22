@@ -9,10 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder(toBuilder = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class TripDTO {
+public class LocationDTO {
     private String id;
-    private String travelId;
-    private String destination;
-    private String departureDate;
-    private String returnDate;
+    private String province;
+    private String city;
 }

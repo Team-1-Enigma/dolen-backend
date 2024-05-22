@@ -1,18 +1,24 @@
 package com.enigma.dolen.service.impl;
 
+import com.enigma.dolen.model.dto.ItineraryDetailDTO;
+import com.enigma.dolen.model.entity.Itinerary;
 import com.enigma.dolen.model.entity.ItineraryDetail;
 import com.enigma.dolen.model.exception.ApplicationException;
 import com.enigma.dolen.repository.ItineraryDetailRepository;
 import com.enigma.dolen.service.ItineraryDetailService;
+import com.enigma.dolen.service.ItineraryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
 public class ItineraryDetailServiceImpl implements ItineraryDetailService {
 
     private final ItineraryDetailRepository itineraryDetailRepository;
+    private final ItineraryService itineraryService;
 
     @Override
     public ItineraryDetail create(ItineraryDetail itineraryDetail) {
@@ -26,8 +32,27 @@ public class ItineraryDetailServiceImpl implements ItineraryDetailService {
     }
 
     @Override
-    public ItineraryDetail update(ItineraryDetail itineraryDetail) {
-        return itineraryDetailRepository.save(itineraryDetail);
+    public ItineraryDetailDTO update(String id, ItineraryDetailDTO itineraryDetailDTO) {
+        Itinerary existingItinerary = itineraryService.findById(itineraryDetailDTO.getItineraryId());
+        if (existingItinerary == null) {
+            return null;
+        }
+        ItineraryDetail itineraryDetail = ItineraryDetail.builder()
+                .id(id)
+                .itinerary(existingItinerary)
+                .startTime(LocalDateTime.parse(itineraryDetailDTO.getStartTime()))
+                .endTime(LocalDateTime.parse(itineraryDetailDTO.getEndTime()))
+                .activityDesc(itineraryDetailDTO.getActivityDesc())
+                .build();
+        itineraryDetailRepository.save(itineraryDetail);
+
+        return ItineraryDetailDTO.builder()
+                .id(itineraryDetail.getId())
+                .itineraryId(itineraryDetail.getItinerary().getId())
+                .startTime(String.valueOf(itineraryDetail.getStartTime()))
+                .endTime(String.valueOf(itineraryDetail.getEndTime()))
+                .activityDesc(itineraryDetail.getActivityDesc())
+                .build();
     }
 
     @Override

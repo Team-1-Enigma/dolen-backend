@@ -18,15 +18,14 @@ import java.util.List;
 public class TripRequest {
     private String id;
     private String travelId;
-    private String cityId;
-    private String name;
     private String destination;
     private String departureDate;
     private String returnDate;
 
-    private List<Participant> participantlist;
-    private List<TripPrice> tripPrices;
-    private List<Itinerary> itineraries;
+    private LocationDTO locationDTO;
+
+    private TripPriceRequest tripPriceRequest;
+    private List<ItineraryDTO> itineraryDTOList;
 
     private List<MultipartFile> files;
 }

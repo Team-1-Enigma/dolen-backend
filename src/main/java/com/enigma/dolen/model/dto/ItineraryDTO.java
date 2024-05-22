@@ -15,8 +15,7 @@ import java.util.List;
 public class ItineraryDTO {
 
     private String id;
-    private String travelId;
+    private String tripId;
     private Integer dayNumber;
-    private String description;
     private List<ItineraryDetail> itineraryDetails;
 }

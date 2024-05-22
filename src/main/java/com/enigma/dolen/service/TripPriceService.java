@@ -9,6 +9,7 @@ import java.util.List;
 
 public interface TripPriceService {
     TripPriceResponse createTripPrice(String tripId, TripPriceRequest tripPriceRequest);
-    List<TripPriceResponse> getTripPricebyTripId(String tripId);
+    List<TripPriceResponse> getTripPriceByTripId(String tripId);
     TripPriceDiscountResponse getTripPriceDiscount(String tripId);
+    TripPriceResponse deleteTripPrice(String tripPriceId);
 }

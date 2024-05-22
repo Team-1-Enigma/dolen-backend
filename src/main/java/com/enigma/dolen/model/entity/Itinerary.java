@@ -38,6 +38,7 @@ public class Itinerary {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
+
     @OneToMany(mappedBy = "itinerary")
     private List<ItineraryDetail> itineraryDetails;
 }

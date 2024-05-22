@@ -70,8 +70,8 @@ public class AuthServiceImpl implements AuthService {
         User user = userService.createUser(userDTO);
         Role role = roleService.getOrSave(ERole.USER);
         UserCredential userCredential = userCredentialService.createCredential(registerRequest, user, role);
-//        UserVerification userVerification = userVerificationService.createVerification(userCredential, url);
-//        userCredential.setVerification(userVerification);
+        UserVerification userVerification = userVerificationService.createVerification(userCredential, url);
+        userCredential.setVerification(userVerification);
 
         return RegisterResponse.builder()
                 .credentialId(userCredential.getId())

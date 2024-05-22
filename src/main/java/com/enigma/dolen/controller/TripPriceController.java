@@ -32,8 +32,8 @@ public class TripPriceController {
     }
 
     @GetMapping("/{id}/price")
-    public ResponseEntity<?> getTripPricebyTripId(@PathVariable String id){
-        List<TripPriceResponse> tripPriceResponses = tripPriceService.getTripPricebyTripId(id);
+    public ResponseEntity<?> getTripPriceByTripId(@PathVariable String id){
+        List<TripPriceResponse> tripPriceResponses = tripPriceService.getTripPriceByTripId(id);
 
         return ResponseEntity.status(HttpStatus.OK)
                .body(CommonResponse.builder()

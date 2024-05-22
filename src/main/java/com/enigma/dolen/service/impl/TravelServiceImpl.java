@@ -3,8 +3,6 @@ package com.enigma.dolen.service.impl;
 import com.enigma.dolen.constant.EGender;
 import com.enigma.dolen.constant.ERole;
 import com.enigma.dolen.model.dto.*;
-import com.enigma.dolen.model.entity.BankAccount;
-import com.enigma.dolen.model.entity.ImageTravel;
 import com.enigma.dolen.model.entity.Travel;
 import com.enigma.dolen.model.entity.User;
 import com.enigma.dolen.repository.TravelRepository;
@@ -14,17 +12,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.OptionalDouble;
-import java.util.stream.Collectors;
-
-import static com.fasterxml.jackson.databind.util.ClassUtil.name;
 
 @Service
 @RequiredArgsConstructor
@@ -80,7 +73,7 @@ public class TravelServiceImpl implements TravelService {
 
 
         List<ImageTravelResponse> imageTravelResponses = imageTravelService.createImageTravel(travel, travelRequest);
-        BankAccountResponse bankAccountResponse = bankAccountService.createBankAccount(travel, travelRequest);
+        List<BankAccountResponse> bankAccountResponse = bankAccountService.createBankAccount(travel, travelRequest);
 
         return TravelCreateResponse.builder()
                 .id(travel.getId())
@@ -90,7 +83,7 @@ public class TravelServiceImpl implements TravelService {
                 .address(travel.getAddress())
                 .createdAt(travel.getCreatedAt())
                 .isActive(travel.getIsActive())
-                .bankAccountResponseList((List.of(bankAccountResponse)))
+                .bankAccountResponseList(bankAccountResponse)
                 .imageTravelResponseList(imageTravelResponses)
                 .build();
     }
