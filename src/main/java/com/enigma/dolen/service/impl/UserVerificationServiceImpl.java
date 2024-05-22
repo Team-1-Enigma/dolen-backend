@@ -41,7 +41,7 @@ public class UserVerificationServiceImpl implements UserVerificationService {
     public void sendVerificationEmail(UserCredential userCredential, UserVerification userVerification, String url)
             throws UnsupportedEncodingException {
         String toAddress = userCredential.getEmail();
-        String fromAddress = "qaultsabitm@gmail.com";
+        String fromAddress = "imamsuyuti@gmail.com";
         String senderName = "Dolen";
         String subject = "Please verify your email address";
         String content = "Dear [[name]],<br>"

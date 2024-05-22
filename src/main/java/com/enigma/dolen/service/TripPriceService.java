@@ -8,7 +8,7 @@ import com.enigma.dolen.model.entity.TripPrice;
 import java.util.List;
 
 public interface TripPriceService {
-    TripPriceResponse createTripPrice(TripPriceRequest tripPriceRequest);
+    TripPriceResponse createTripPrice(String tripId, TripPriceRequest tripPriceRequest);
     List<TripPriceResponse> getTripPricebyTripId(String tripId);
     TripPriceDiscountResponse getTripPriceDiscount(String tripId);
 }
