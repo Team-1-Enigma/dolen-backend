@@ -5,7 +5,6 @@ import com.enigma.dolen.model.entity.UserVerification;
 import com.enigma.dolen.model.exception.ApplicationException;
 import com.enigma.dolen.repository.UserVerificationRepository;
 import com.enigma.dolen.service.EmailService;
-import com.enigma.dolen.service.UserCredentialService;
 import com.enigma.dolen.service.UserVerificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
