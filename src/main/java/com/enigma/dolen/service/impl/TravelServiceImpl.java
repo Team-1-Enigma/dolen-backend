@@ -78,7 +78,6 @@ public class TravelServiceImpl implements TravelService {
                 .build();
         travelRepository.saveAndFlush(travel);
 
-
         List<ImageTravelResponse> imageTravelResponses = imageTravelService.createImageTravel(travel, travelRequest);
         BankAccountResponse bankAccountResponse = bankAccountService.createBankAccount(travel, travelRequest);
 

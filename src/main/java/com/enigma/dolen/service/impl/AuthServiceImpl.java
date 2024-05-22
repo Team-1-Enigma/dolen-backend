@@ -73,6 +73,9 @@ public class AuthServiceImpl implements AuthService {
         UserVerification userVerification = userVerificationService.createVerification(userCredential, url);
         userCredential.setVerification(userVerification);
 
+        userVerificationService.verify(        userVerification.getVerificationCode()
+        );
+
         return RegisterResponse.builder()
                 .credentialId(userCredential.getId())
                 .email(userCredential.getEmail())

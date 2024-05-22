@@ -25,6 +25,7 @@ public class TravelController {
     @PostMapping
     public ResponseEntity<?> createTravel(@ModelAttribute TravelRequest travelRequest){
 
+        System.out.println(travelRequest);
         TravelCreateResponse travelCreateResponse = travelService.createTravel(travelRequest);
 
         return ResponseEntity.status(HttpStatus.CREATED)
