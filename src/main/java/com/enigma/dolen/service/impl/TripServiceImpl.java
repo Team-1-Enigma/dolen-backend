@@ -88,7 +88,7 @@ public class TripServiceImpl implements TripService {
 
         List<ImageTripResponse> imageTripResponses = imageTripService.createImageTrip(trip, tripRequest);
         List<ItineraryDTO> itineraryDTOList = itineraryService.create(trip, tripRequest);
-        TripPriceResponse tripPriceResponse = tripPriceService.createTripPrice(trip.getId(), tripRequest.getTripPriceRequest());
+        TripPriceResponse tripPriceResponse = tripPriceService.createTripPrice(trip, tripRequest.getTripPriceRequest());
 
         return TripResponse.builder()
                 .id(trip.getId())
@@ -103,6 +103,12 @@ public class TripServiceImpl implements TripService {
                 .imageTripResponseList(imageTripResponses)
                 .itineraryDTOList(itineraryDTOList)
                 .tripPriceResponse(tripPriceResponse)
+                .tripPriceDiscountResponse(TripPriceDiscountResponse.builder()
+                        .tripId(trip.getId())
+                        .priceBefore(null)
+                        .priceAfter(tripPriceResponse.getPrice())
+                        .discount(null)
+                        .build())
                 .build();
     }
 

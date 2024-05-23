@@ -1,6 +1,7 @@
 package com.enigma.dolen.service.impl;
 
 import com.enigma.dolen.model.dto.ItineraryDTO;
+import com.enigma.dolen.model.dto.ItineraryDetailDTO;
 import com.enigma.dolen.model.dto.TripRequest;
 import com.enigma.dolen.model.entity.Itinerary;
 import com.enigma.dolen.model.entity.ItineraryDetail;
@@ -44,18 +45,23 @@ public class ItineraryServiceImpl implements ItineraryService {
         List<Itinerary> itineraries = new ArrayList<>();
         for (ItineraryDTO itineraryDTO : tripRequest.getItineraryDTOList()) {
 
-            List<ItineraryDetail> itineraryDetails = new ArrayList<>();
-            for (ItineraryDetail itineraryDetail : itineraryDTO.getItineraryDetails()) {
-                itineraryDetails.add(itineraryDetailService.create(itineraryDetail));
-            }
-
             Itinerary itinerary = Itinerary.builder()
                     .dayNumber(itineraryDTO.getDayNumber())
                     .trip(trip)
-                    .itineraryDetails(itineraryDetails)
+                    .itineraryDetails(new ArrayList<>())
                     .build();
 
             Itinerary savedItinerary = itineraryRepository.saveAndFlush(itinerary);
+
+            List<ItineraryDetail> itineraryDetails = new ArrayList<>();
+            for (ItineraryDetailDTO itineraryDetail : itineraryDTO.getItineraryDetailDTOList()) {
+                ItineraryDetail saveItineraryDetail = itineraryDetailService.create(savedItinerary, itineraryDetail);
+
+                itineraryDetails.add(saveItineraryDetail);
+            }
+
+            savedItinerary.setItineraryDetails(itineraryDetails);
+            itineraryRepository.saveAndFlush(savedItinerary);
 
             itineraries.add(savedItinerary);
         }
@@ -70,19 +76,22 @@ public class ItineraryServiceImpl implements ItineraryService {
         if (existingTrip == null) {
             return null;
         }
-        List<ItineraryDetail> itineraryDetails = new ArrayList<>();
-        for (ItineraryDetail itineraryDetail : itineraryDTO.getItineraryDetails()) {
-            itineraryDetails.add(itineraryDetailService.create(itineraryDetail));
-        }
 
         Itinerary itinerary = Itinerary.builder()
                 .dayNumber(itineraryDTO.getDayNumber())
                 .trip(existingTrip)
-                .createdAt(LocalDateTime.now())
-                .itineraryDetails(itineraryDetails)
+                .itineraryDetails(new ArrayList<>())
                 .build();
 
-        itineraryRepository.saveAndFlush(itinerary);
+        Itinerary savedItinerary = itineraryRepository.saveAndFlush(itinerary);
+
+        List<ItineraryDetail> itineraryDetails = new ArrayList<>();
+        for (ItineraryDetailDTO itineraryDetail : itineraryDTO.getItineraryDetailDTOList()) {
+            itineraryDetails.add(itineraryDetailService.create(savedItinerary, itineraryDetail));
+        }
+
+        savedItinerary.setItineraryDetails(itineraryDetails);
+        itineraryRepository.saveAndFlush(savedItinerary);
 
         return toItineraryDTO(itinerary);
     }
@@ -91,7 +100,14 @@ public class ItineraryServiceImpl implements ItineraryService {
         return ItineraryDTO.builder()
                 .id(savedItinerary.getId())
                 .dayNumber(savedItinerary.getDayNumber())
-                .itineraryDetails(savedItinerary.getItineraryDetails())
+                .itineraryDetailDTOList(savedItinerary.getItineraryDetails().stream()
+                        .map(itineraryDetail -> ItineraryDetailDTO.builder()
+                                .id(itineraryDetail.getId())
+                                .startTime(String.valueOf(itineraryDetail.getStartTime()))
+                                .endTime(String.valueOf(itineraryDetail.getEndTime()))
+                                .activityDesc(itineraryDetail.getActivityDesc())
+                                .build())
+                        .toList())
                 .build();
     }
 
@@ -128,7 +144,14 @@ public class ItineraryServiceImpl implements ItineraryService {
                 .id(existingItinerary.getId())
                 .trip(existingTrip)
                 .dayNumber(itineraryDTO.getDayNumber())
-                .itineraryDetails(itineraryDTO.getItineraryDetails())
+                .itineraryDetails(itineraryDTO.getItineraryDetailDTOList().stream()
+                        .map(itineraryDetailDTO -> ItineraryDetail.builder()
+                                .itinerary(existingItinerary)
+                                .startTime(LocalDateTime.parse(itineraryDetailDTO.getStartTime()))
+                                .endTime(LocalDateTime.parse(itineraryDetailDTO.getEndTime()))
+                                .activityDesc(itineraryDetailDTO.getActivityDesc())
+                                .build())
+                        .toList())
                 .updatedAt(LocalDateTime.now())
                 .build();
         itineraryRepository.saveAndFlush(newItinerary);
@@ -136,7 +159,14 @@ public class ItineraryServiceImpl implements ItineraryService {
         return ItineraryDTO.builder()
                 .id(newItinerary.getId())
                 .dayNumber(newItinerary.getDayNumber())
-                .itineraryDetails(newItinerary.getItineraryDetails())
+                .itineraryDetailDTOList(newItinerary.getItineraryDetails().stream()
+                        .map(itineraryDetail -> ItineraryDetailDTO.builder()
+                                .id(itineraryDetail.getId())
+                                .startTime(String.valueOf(itineraryDetail.getStartTime()))
+                                .endTime(String.valueOf(itineraryDetail.getEndTime()))
+                                .activityDesc(itineraryDetail.getActivityDesc())
+                                .build())
+                        .toList())
                 .build();
     }
 

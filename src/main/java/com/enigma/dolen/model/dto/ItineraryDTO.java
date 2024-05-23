@@ -13,9 +13,8 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class ItineraryDTO {
-
     private String id;
     private String tripId;
     private Integer dayNumber;
-    private List<ItineraryDetail> itineraryDetails;
+    private List<ItineraryDetailDTO> itineraryDetailDTOList;
 }

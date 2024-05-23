@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Service
 @RequiredArgsConstructor
@@ -21,7 +22,20 @@ public class ItineraryDetailServiceImpl implements ItineraryDetailService {
     private final ItineraryService itineraryService;
 
     @Override
-    public ItineraryDetail create(ItineraryDetail itineraryDetail) {
+    public ItineraryDetail create(Itinerary itinerary, ItineraryDetailDTO itineraryDetailDTO) {
+        Itinerary existingItinerary = itineraryService.findById(itinerary.getId());
+        if (existingItinerary == null){
+            return null;
+        }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+
+        ItineraryDetail itineraryDetail = ItineraryDetail.builder()
+                .itinerary(itinerary)
+                .startTime(LocalDateTime.parse(itineraryDetailDTO.getStartTime(), formatter))
+                .endTime(LocalDateTime.parse(itineraryDetailDTO.getEndTime(), formatter))
+                .activityDesc(itineraryDetailDTO.getActivityDesc())
+                .build();
+
         return itineraryDetailRepository.save(itineraryDetail);
     }
 

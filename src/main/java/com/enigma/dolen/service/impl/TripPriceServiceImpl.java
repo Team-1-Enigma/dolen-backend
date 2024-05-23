@@ -22,7 +22,25 @@ public class TripPriceServiceImpl implements TripPriceService {
     private final TripPriceRepository tripPriceRepository;
     private final TripService tripService;
     @Override
-    public TripPriceResponse createTripPrice(String tripId, TripPriceRequest tripPriceRequest) {
+    public TripPriceResponse createTripPrice(Trip trip, TripPriceRequest tripPriceRequest) {
+        Trip existingTrip = tripService.getTripByIdForOther(trip.getId());
+        if (existingTrip == null){
+            return null;
+        }
+
+        TripPrice tripPrice = TripPrice.builder()
+                .trip(existingTrip)
+                .price(tripPriceRequest.getPrice())
+                .quota(tripPriceRequest.getQuota())
+                .isActive(true)
+                .build();
+        tripPriceRepository.saveAndFlush(tripPrice);
+
+        return toTripPriceResponse(tripPrice);
+    }
+
+    @Override
+    public TripPriceResponse addTripPrice(String tripId, TripPriceRequest tripPriceRequest) {
         Trip existingTrip = tripService.getTripByIdForOther(tripId);
         if (existingTrip == null){
             return null;
@@ -55,6 +73,8 @@ public class TripPriceServiceImpl implements TripPriceService {
                 .createdAt(tripPrice.getCreatedAt())
                 .build();
     }
+
+
 
     @Override
     public List<TripPriceResponse> getTripPriceByTripId(String tripId) {

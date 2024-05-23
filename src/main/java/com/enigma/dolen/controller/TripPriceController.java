@@ -21,7 +21,7 @@ public class TripPriceController {
 
     @PostMapping("/{id}/price")
     public ResponseEntity<?> createTripPrice(@PathVariable String id, @RequestBody TripPriceRequest request){
-        TripPriceResponse response = tripPriceService.createTripPrice(id, request);
+        TripPriceResponse response = tripPriceService.addTripPrice(id, request);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(CommonResponse.builder()

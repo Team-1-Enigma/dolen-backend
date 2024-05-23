@@ -24,6 +24,7 @@ public class TripController {
     @PostMapping("/{travel_id}/trip")
     public ResponseEntity<?> createTrip(@PathVariable("travel_id") String travel_id, @ModelAttribute TripRequest tripRequest){
 
+        System.out.println(travel_id);
         TripResponse tripResponse = tripService.createTrip(travel_id, tripRequest);
 
         return ResponseEntity.status(HttpStatus.CREATED)

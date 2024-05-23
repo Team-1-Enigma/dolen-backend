@@ -27,7 +27,12 @@ public class LocationServiceImpl implements LocationService {
                 .city(locationDTO.getCity())
                 .province(locationDTO.getProvince())
                 .build();
+        locationRepository.save(location);
 
-        return locationRepository.save(location);
+        return Location.builder()
+                .id(location.getId())
+                .city(location.getCity())
+                .province(location.getProvince())
+                .build();
     }
 }
