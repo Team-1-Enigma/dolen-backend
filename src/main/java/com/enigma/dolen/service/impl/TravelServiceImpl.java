@@ -73,7 +73,7 @@ public class TravelServiceImpl implements TravelService {
 
 
         List<ImageTravelResponse> imageTravelResponses = imageTravelService.createImageTravel(travel, travelRequest);
-        List<BankAccountResponse> bankAccountResponse = bankAccountService.createBankAccount(travel, travelRequest);
+//        List<BankAccountResponse> bankAccountResponse = bankAccountService.createBankAccount(travel, travelRequest);
 
         return TravelCreateResponse.builder()
                 .id(travel.getId())
@@ -83,7 +83,7 @@ public class TravelServiceImpl implements TravelService {
                 .address(travel.getAddress())
                 .createdAt(travel.getCreatedAt())
                 .isActive(travel.getIsActive())
-                .bankAccountResponseList(bankAccountResponse)
+                .bankAccountResponseList(null)
                 .imageTravelResponseList(imageTravelResponses)
                 .build();
     }

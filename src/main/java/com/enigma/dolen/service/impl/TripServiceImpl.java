@@ -73,7 +73,7 @@ public class TripServiceImpl implements TripService {
         if (existingTravel == null) {
             return null;
         }
-
+        System.out.println(tripRequest.getDepartureDate());
         Location location = locationService.getOrSave(tripRequest.getLocationDTO());
 
         Trip trip = Trip.builder()

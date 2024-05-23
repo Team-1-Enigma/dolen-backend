@@ -2,18 +2,11 @@ package com.enigma.dolen.service.impl;
 
 import com.enigma.dolen.constant.EGender;
 import com.enigma.dolen.constant.EStatus;
-import com.enigma.dolen.model.dto.CreateOrderRequest;
-import com.enigma.dolen.model.dto.OrderDetailResponse;
-import com.enigma.dolen.model.dto.OrderResponse;
-import com.enigma.dolen.model.dto.UserDTO;
-import com.enigma.dolen.model.entity.Order;
-import com.enigma.dolen.model.entity.OrderDetail;
-import com.enigma.dolen.model.entity.Status;
-import com.enigma.dolen.model.entity.User;
+import com.enigma.dolen.model.dto.*;
+import com.enigma.dolen.model.entity.*;
 import com.enigma.dolen.repository.OrderRepository;
-import com.enigma.dolen.service.OrderService;
-import com.enigma.dolen.service.StatusService;
-import com.enigma.dolen.service.UserService;
+import com.enigma.dolen.service.*;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +19,10 @@ public class OrderServiceImpl implements OrderService {
     private final UserService userService;
     private final OrderRepository orderRepository;
     private final StatusService statusService;
+    private final TripService tripService;
+    private final TripPriceService tripPriceService;
     @Override
+    @Transactional(rollbackOn = Exception.class)
     public OrderResponse createOrder(CreateOrderRequest orderRequest) {
         //VALIDATE USER
         UserDTO userDto= userService.getUserById(orderRequest.getUserId());
@@ -46,15 +42,20 @@ public class OrderServiceImpl implements OrderService {
                 })
         ).toList();
 
+        //TODO:GET ORDER
+        Trip trip = tripService.getTripByIdForOther(orderRequest.getTripId());
+
         //CREATE ORDER
         Order order = orderRepository.saveAndFlush(Order.builder()
                         .orderDetailList(orderDetailList)
                         .user(user)
+                        .trip(trip)
                         .quantity(orderRequest.getQuantity())
                 .build()
         );
 
         //TODO:REDUCE OPEN TRIP AVAILABLE QUOTA
+        tripPriceService.reduceTripPrice(trip.getId(), order.getQuantity());
 
         //CREATE ORDER DETAIL
         List<OrderDetailResponse> orderDetailResponses = order.getOrderDetailList().stream().map(orderDetail -> {

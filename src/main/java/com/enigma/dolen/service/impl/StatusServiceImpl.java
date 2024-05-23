@@ -35,4 +35,9 @@ public class StatusServiceImpl implements StatusService {
         //STREAM ALL ORDER AND GET BY STATUS
         return null;
     }
+
+    @Override
+    public Status changeStatus(EStatus status, String orderId) {
+        return null;
+    }
 }

@@ -14,4 +14,5 @@ public interface TripPriceService {
     List<TripPriceResponse> getTripPriceByTripId(String tripId);
     TripPriceDiscountResponse getTripPriceDiscount(String tripId);
     TripPriceResponse deleteTripPrice(String tripPriceId);
+    void reduceTripPrice(String tripId, Integer n);
 }

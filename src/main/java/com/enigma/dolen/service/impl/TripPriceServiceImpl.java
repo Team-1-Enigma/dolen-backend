@@ -8,6 +8,7 @@ import com.enigma.dolen.model.entity.TripPrice;
 import com.enigma.dolen.repository.TripPriceRepository;
 import com.enigma.dolen.service.TripPriceService;
 import com.enigma.dolen.service.TripService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -140,4 +141,20 @@ public class TripPriceServiceImpl implements TripPriceService {
         tripPriceRepository.saveAndFlush(existingTripPrice);
         return toTripPriceResponse(existingTripPrice);
     }
+
+    @Override
+    public void reduceTripPrice(String tripId, Integer n) {
+        Trip trip = tripService.getTripByIdForOther(tripId);
+
+        TripPriceResponse tripPriceResponse= getTripPriceByTripId(tripId).get(0);
+        Integer remainingQuota = tripPriceResponse.getQuota();
+
+        TripPrice tripPrice = tripPriceRepository.findById(tripPriceResponse.getId()).orElseThrow(() -> new EntityNotFoundException("Trip Price Not Found"));
+
+        tripPrice.setQuota(tripPrice.getQuota() - n);
+
+        tripPriceRepository.save(tripPrice);
+    }
+
+
 }
