@@ -1,4 +1,4 @@
-package com.enigma.dolen.service;
+package com.enigma.dolen.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
