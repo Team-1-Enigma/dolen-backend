@@ -2,13 +2,9 @@ package com.enigma.dolen.service.impl;
 
 import com.enigma.dolen.model.entity.UserCredential;
 import com.enigma.dolen.model.entity.UserVerification;
-import com.enigma.dolen.model.exception.ApplicationException;
 import com.enigma.dolen.repository.UserVerificationRepository;
-import com.enigma.dolen.service.EmailService;
-import com.enigma.dolen.service.UserCredentialService;
 import com.enigma.dolen.service.UserVerificationService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
@@ -29,11 +25,11 @@ public class UserVerificationServiceImpl implements UserVerificationService {
                 .verificationCode(randomCode)
                 .isVerified(false)
                 .build());
-        try {
-            sendVerificationEmail(userCredential, userVerification, url);
-        } catch (UnsupportedEncodingException e) {
-            throw new ApplicationException("Failed to send verification email", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+//        try {
+//            sendVerificationEmail(userCredential, userVerification, url);
+//        } catch (UnsupportedEncodingException e) {
+//            throw new ApplicationException("Failed to send verification email", HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
 
         return userVerification;
     }
