@@ -19,6 +19,7 @@ public class Status {
     private String Id;
 
     @Column(name = "status")
+    @Enumerated(EnumType.STRING)
     private EStatus  status;
 
     @Column(name = "notes")

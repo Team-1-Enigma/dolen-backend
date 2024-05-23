@@ -1,6 +1,8 @@
 package com.enigma.dolen.model.dto;
 
 import com.enigma.dolen.constant.EPaymentStatus;
+import com.enigma.dolen.model.entity.Order;
+import com.enigma.dolen.model.entity.Payment;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,4 +17,5 @@ public class PaymentRequest {
     private Long total;
     private String payment_id;
     private EPaymentStatus paymentStatus;
+    private Order order;
 }
