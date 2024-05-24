@@ -4,6 +4,7 @@ import com.enigma.dolen.model.entity.Trip;
 import com.enigma.dolen.model.entity.User;
 import lombok.*;
 
+import java.time.LocalTime;
 import java.util.List;
 
 @Data
@@ -15,6 +16,7 @@ public class OrderResponse {
     private Integer quantity;
     private User user;
     private Trip trip;
+    private LocalTime order_date;
     private List<OrderDetailResponse> orderDetailResponses;
 
 }

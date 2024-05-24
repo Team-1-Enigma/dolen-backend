@@ -5,4 +5,5 @@ import com.enigma.dolen.model.dto.OrderResponse;
 
 public interface OrderService {
     OrderResponse createOrder (CreateOrderRequest orderRequest);
+    OrderResponse getOrderById(String orderId);
 }

@@ -3,15 +3,20 @@ package com.enigma.dolen.service.impl;
 import com.enigma.dolen.constant.EGender;
 import com.enigma.dolen.constant.ERole;
 import com.enigma.dolen.model.dto.*;
+import com.enigma.dolen.model.entity.AppUser;
 import com.enigma.dolen.model.entity.Travel;
 import com.enigma.dolen.model.entity.User;
+import com.enigma.dolen.model.entity.UserCredential;
 import com.enigma.dolen.repository.TravelRepository;
 import com.enigma.dolen.service.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -26,6 +31,7 @@ public class TravelServiceImpl implements TravelService {
     private final TravelRepository travelRepository;
     private final RoleService roleService;
     private final UserService userService;
+    private final UserCredentialService userCredentialService;
 
     @Lazy
     private ImageTravelService imageTravelService;
@@ -49,8 +55,11 @@ public class TravelServiceImpl implements TravelService {
     @Transactional(rollbackOn = Exception.class)
     public TravelCreateResponse createTravel(TravelRequest travelRequest) {
         UserDTO existingUser = userService.getUserById(travelRequest.getUserId());
-
-        roleService.getOrSave(ERole.TRAVEL_OWNER);
+        AppUser userCredential = userCredentialService.loadUserById(existingUser.getCredentialId());
+        if(userCredential.getRole() == ERole.TRAVEL_OWNER){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "YOU ALREADY HAVE TRAVEL");
+        }
+        userCredentialService.changeUserRole(ERole.TRAVEL_OWNER, existingUser.getCredentialId());
 
         Travel travel = Travel.builder()
                 .user(User.builder()
@@ -73,7 +82,7 @@ public class TravelServiceImpl implements TravelService {
 
 
         List<ImageTravelResponse> imageTravelResponses = imageTravelService.createImageTravel(travel, travelRequest);
-//        List<BankAccountResponse> bankAccountResponse = bankAccountService.createBankAccount(travel, travelRequest);
+        List<BankAccountResponse> bankAccountResponse = bankAccountService.createBankAccount(travel, travelRequest);
 
         return TravelCreateResponse.builder()
                 .id(travel.getId())

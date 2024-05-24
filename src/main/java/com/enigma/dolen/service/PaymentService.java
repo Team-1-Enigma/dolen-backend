@@ -5,4 +5,5 @@ import com.enigma.dolen.model.dto.PaymentResponse;
 
 public interface PaymentService {
     PaymentResponse createPayment(PaymentRequest paymentRequest);
+    PaymentResponse getPaymentByOrderId(String orderId);
 }

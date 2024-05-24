@@ -2,6 +2,7 @@ package com.enigma.dolen.service;
 
 import java.util.Optional;
 
+import com.enigma.dolen.constant.ERole;
 import com.enigma.dolen.model.entity.AppUser;
 import com.enigma.dolen.model.entity.Role;
 import com.enigma.dolen.model.entity.User;
@@ -18,4 +19,6 @@ public interface UserCredentialService extends UserDetailsService {
     UserCredential findById(String id);
 
     AppUser loadUserById(String credentialId);
+
+    void changeUserRole(ERole eRole, String credentialId);
 }

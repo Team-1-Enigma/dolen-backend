@@ -6,11 +6,13 @@ import com.enigma.dolen.model.dto.*;
 import com.enigma.dolen.model.entity.*;
 import com.enigma.dolen.repository.OrderRepository;
 import com.enigma.dolen.service.*;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 @Service
@@ -21,6 +23,7 @@ public class OrderServiceImpl implements OrderService {
     private final StatusService statusService;
     private final TripService tripService;
     private final TripPriceService tripPriceService;
+    private final PaymentService paymentService;
     @Override
     @Transactional(rollbackOn = Exception.class)
     public OrderResponse createOrder(CreateOrderRequest orderRequest) {
@@ -67,6 +70,16 @@ public class OrderServiceImpl implements OrderService {
                     .build();
         }).toList();
 
+        //TODO CREATE PAYMENT
+        TripPriceResponse tripPrice = tripPriceService.getTripPriceByTripId(trip.getId()).get(0);
+        Long total = tripPrice.getPrice() * orderRequest.getQuantity();
+
+        PaymentRequest paymentRequest = PaymentRequest.builder()
+                .order(order)
+                .total(total)
+                .build();
+        paymentService.createPayment(paymentRequest);
+
         //CREATE ORDER STATUS
         statusService.createStatus(Status.builder()
                 .status(EStatus.valueOf("WAITING"))
@@ -82,4 +95,27 @@ public class OrderServiceImpl implements OrderService {
                 .orderDetailResponses(orderDetailResponses)
                 .build();
     }
+
+    @Override
+    public OrderResponse getOrderById(String orderId) {
+        Order order = orderRepository.findById(orderId).orElseThrow(() ->  new EntityNotFoundException("Order Not Found"));
+
+        List<OrderDetailResponse> orderDetailResponses = order.getOrderDetailList().stream().map(orderDetail -> {
+            return OrderDetailResponse.builder()
+                    .Id(orderDetail.getId())
+                    .participantName(orderDetail.getParticipantName())
+                    .contact(orderDetail.getContact())
+                    .build();
+        }).toList();
+        return OrderResponse.builder()
+                .id(order.getId())
+                .user(order.getUser())
+                .trip(order.getTrip())
+                .quantity(order.getQuantity())
+                .order_date(LocalTime.from(order.getOrder_date()))
+                .orderDetailResponses(orderDetailResponses)
+                .build();
+    }
+
+
 }

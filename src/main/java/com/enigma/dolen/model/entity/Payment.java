@@ -22,6 +22,7 @@ public class Payment {
     private Long total;
 
     @Column(name = "status")
+    @Enumerated(EnumType.STRING)
     private EPaymentStatus paymentStatus;
 
     @OneToOne
