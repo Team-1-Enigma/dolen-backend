@@ -31,6 +31,7 @@ public class ItineraryServiceImpl implements ItineraryService {
 
     @Lazy
     private ItineraryDetailService itineraryDetailService;
+    private ItineraryDetailRepository itineraryDetailRepository;
 
     @Autowired
     @Lazy
@@ -140,33 +141,24 @@ public class ItineraryServiceImpl implements ItineraryService {
         }
 
         Itinerary newItinerary = Itinerary.builder()
-                .id(existingItinerary.getId())
+                .id(id)
                 .trip(existingTrip)
                 .dayNumber(itineraryDTO.getDayNumber())
-                .itineraryDetails(itineraryDTO.getItineraryDetailDTOList().stream()
-                        .map(itineraryDetailDTO -> ItineraryDetail.builder()
-                                .itinerary(existingItinerary)
-                                .startTime(LocalDateTime.parse(itineraryDetailDTO.getStartTime()))
-                                .endTime(LocalDateTime.parse(itineraryDetailDTO.getEndTime()))
-                                .activityDesc(itineraryDetailDTO.getActivityDesc())
-                                .build())
-                        .toList())
                 .updatedAt(LocalDateTime.now())
-                .build();
-        itineraryRepository.saveAndFlush(newItinerary);
+                .createdAt(existingTrip.getCreatedAt())
+                .itineraryDetails(existingItinerary.getItineraryDetails())
+                        .build();
+        Itinerary savedItinerary = itineraryRepository.saveAndFlush(newItinerary);
 
-        return ItineraryDTO.builder()
-                .id(newItinerary.getId())
-                .dayNumber(newItinerary.getDayNumber())
-                .itineraryDetailDTOList(newItinerary.getItineraryDetails().stream()
-                        .map(itineraryDetail -> ItineraryDetailDTO.builder()
-                                .id(itineraryDetail.getId())
-                                .startTime(String.valueOf(itineraryDetail.getStartTime()))
-                                .endTime(String.valueOf(itineraryDetail.getEndTime()))
-                                .activityDesc(itineraryDetail.getActivityDesc())
-                                .build())
-                        .toList())
-                .build();
+        List<ItineraryDetail> itineraryDetails = new ArrayList<>();
+        for (ItineraryDetailDTO itineraryDetail : itineraryDTO.getItineraryDetailDTOList()) {
+            itineraryDetails.add(itineraryDetailService.updateForItinerary(savedItinerary, itineraryDetail));
+        }
+        savedItinerary.setItineraryDetails(itineraryDetails);
+        itineraryRepository.saveAndFlush(savedItinerary);
+
+
+        return toItineraryDTO(savedItinerary);
     }
 
     @Override
@@ -218,5 +210,10 @@ public class ItineraryServiceImpl implements ItineraryService {
         itineraryRepository.deleteById(id);
 
         return existingItinerary.getId();
+    }
+
+    @Autowired
+    public void setItineraryDetailRepository(ItineraryDetailRepository itineraryDetailRepository) {
+        this.itineraryDetailRepository = itineraryDetailRepository;
     }
 }

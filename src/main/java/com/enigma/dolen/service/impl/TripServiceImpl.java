@@ -266,12 +266,8 @@ public class TripServiceImpl implements TripService {
         }
 
         for(Itinerary itinerary : existingTrip.getItineraries()){
-            for (ItineraryDetail itineraryDetail : itinerary.getItineraryDetails()){
-                itineraryDetailService.delete(itineraryDetail.getId());
-            }
             itineraryService.delete(itinerary.getId());
         }
-
 
         return existingTrip.getId();
     }

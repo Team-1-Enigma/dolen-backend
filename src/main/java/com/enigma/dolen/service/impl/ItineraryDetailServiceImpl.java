@@ -51,11 +51,13 @@ public class ItineraryDetailServiceImpl implements ItineraryDetailService {
         if (existingItinerary == null) {
             return null;
         }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+
         ItineraryDetail itineraryDetail = ItineraryDetail.builder()
                 .id(id)
                 .itinerary(existingItinerary)
-                .startTime(LocalDateTime.parse(itineraryDetailDTO.getStartTime()))
-                .endTime(LocalDateTime.parse(itineraryDetailDTO.getEndTime()))
+                .startTime(LocalDateTime.parse(itineraryDetailDTO.getStartTime(), formatter))
+                .endTime(LocalDateTime.parse(itineraryDetailDTO.getEndTime(), formatter))
                 .activityDesc(itineraryDetailDTO.getActivityDesc())
                 .build();
         itineraryDetailRepository.save(itineraryDetail);
@@ -67,6 +69,20 @@ public class ItineraryDetailServiceImpl implements ItineraryDetailService {
                 .endTime(String.valueOf(itineraryDetail.getEndTime()))
                 .activityDesc(itineraryDetail.getActivityDesc())
                 .build();
+    }
+
+    @Override
+    public ItineraryDetail updateForItinerary(Itinerary itinerary, ItineraryDetailDTO itineraryDetailDTO) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+
+        ItineraryDetail itineraryDetail = ItineraryDetail.builder()
+                .id(itineraryDetailDTO.getId())
+                .itinerary(itinerary)
+                .startTime(LocalDateTime.parse(itineraryDetailDTO.getStartTime(), formatter))
+                .endTime(LocalDateTime.parse(itineraryDetailDTO.getEndTime(), formatter))
+                .activityDesc(itineraryDetailDTO.getActivityDesc())
+                .build();
+        return itineraryDetailRepository.save(itineraryDetail);
     }
 
     @Override
