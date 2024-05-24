@@ -83,6 +83,8 @@ public class ImageTripServiceImpl implements ImageTripService {
         return imageTripResponses;
     }
 
+
+
     @Override
     public List<ImageTripResponse> getAllPhotoByTravelId(String tripId) {
         Trip existingTrip = tripService.getTripByIdForOther(tripId);
@@ -93,6 +95,38 @@ public class ImageTripServiceImpl implements ImageTripService {
                 .filter(imageTrip -> imageTrip.getIsActive())
                .map(imageTrip -> toImageTripResponse(imageTrip)).toList();
         return imageTripResponses;
+    }
+
+    @Override
+    public List<ImageTripResponse> updateImageTrip(Trip trip, TripRequest tripRequest) {
+        Trip existingTrip = tripService.getTripByIdForOther(trip.getId());
+
+        for (ImageTrip imageTrip : existingTrip.getImageTrips()){
+            if (imageTrip.getIsActive()){
+                ImageTrip  value = ImageTrip.builder()
+                        .id(imageTrip.getId())
+                        .trip(existingTrip)
+                        .imageUrl(imageTrip.getImageUrl())
+                        .isActive(false)
+                        .build();
+                imageTripRepository.saveAndFlush(value);
+            }
+        }
+
+        List<ImageTripResponse> imageTripUrls = new ArrayList<>();
+        for(MultipartFile file : tripRequest.getFiles()){
+            String imageUrl = uploadImageService.uploadImage(file);
+
+            ImageTrip imageTrip = ImageTrip.builder()
+                    .trip(existingTrip)
+                    .imageUrl(imageUrl)
+                    .isActive(true)
+                    .build();
+            imageTripRepository.saveAndFlush(imageTrip);
+
+            imageTripUrls.add(toImageTripResponse(imageTrip));
+        }
+        return imageTripUrls;
     }
 
     @Override

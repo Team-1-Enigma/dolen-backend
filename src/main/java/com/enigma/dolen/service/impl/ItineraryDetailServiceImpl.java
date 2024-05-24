@@ -70,6 +70,21 @@ public class ItineraryDetailServiceImpl implements ItineraryDetailService {
     }
 
     @Override
+    public ItineraryDetail updateForTrip(Itinerary itinerary, ItineraryDetailDTO itineraryDetailDTO) {
+
+        ItineraryDetail itineraryDetail = ItineraryDetail.builder()
+                .id(itinerary.getId())
+                .itinerary(itinerary)
+                .startTime(LocalDateTime.parse(itineraryDetailDTO.getStartTime()))
+                .endTime(LocalDateTime.parse(itineraryDetailDTO.getEndTime()))
+                .activityDesc(itineraryDetailDTO.getActivityDesc())
+                .build();
+        itineraryDetailRepository.save(itineraryDetail);
+
+        return itineraryDetail;
+    }
+
+    @Override
     public String delete(String id) {
         if (!itineraryDetailRepository.existsById(id)) {
             throw new ApplicationException("Itinerary Detail not found", HttpStatus.NOT_FOUND);

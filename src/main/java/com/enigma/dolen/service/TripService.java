@@ -12,6 +12,6 @@ public interface TripService {
     TripResponse createTrip(String travel_id, TripRequest tripRequest);
     List<TripResponse> getTripByTravelId(String travelId);
     List<TripResponse> getAllTrip();
-    TripResponse updateTrip(String tripId, TripDTO tripDTO);
+    TripResponse updateTrip(String tripId, TripRequest tripRequest);
     String deleteTrip(String tripId);
 }
