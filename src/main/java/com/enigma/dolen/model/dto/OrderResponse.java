@@ -12,10 +12,10 @@ import java.util.List;
 @AllArgsConstructor
 @Builder(toBuilder = true)
 public class OrderResponse {
-    private  String id;
+    private String id;
     private Integer quantity;
     private User user;
-    private Trip trip;
+    private TripResponse trip;
     private LocalTime order_date;
     private List<OrderDetailResponse> orderDetailResponses;
 

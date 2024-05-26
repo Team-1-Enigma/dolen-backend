@@ -2,10 +2,13 @@ package com.enigma.dolen.service.impl;
 
 import com.enigma.dolen.constant.EStatus;
 import com.enigma.dolen.model.dto.TravelCreateResponse;
+import com.enigma.dolen.model.entity.Order;
 import com.enigma.dolen.model.entity.Status;
+import com.enigma.dolen.repository.OrderRepository;
 import com.enigma.dolen.repository.StatusRepository;
 import com.enigma.dolen.service.StatusService;
 import com.enigma.dolen.service.TravelService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +19,7 @@ import java.util.List;
 public class StatusServiceImpl implements StatusService {
     private final StatusRepository statusRepository;
     private final TravelService travelService;
+    private final OrderRepository orderRepository;
     @Override
     public Status createStatus(Status status) {
         status.setStatus(EStatus.valueOf("WAITING"));
@@ -37,7 +41,11 @@ public class StatusServiceImpl implements StatusService {
     }
 
     @Override
-    public Status changeStatus(EStatus status, String orderId) {
-        return null;
+    public Status changeStatus(EStatus eStatus, String orderId) {
+
+        Status status = statusRepository.getStatusByOrder_Id(orderId);
+        status.setStatus(eStatus);
+
+        return statusRepository.save(status);
     }
 }

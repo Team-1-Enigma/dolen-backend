@@ -11,4 +11,5 @@ import com.enigma.dolen.model.entity.UserCredential;
 public interface UserCredentialRepository extends JpaRepository<UserCredential, String> {
 
     Optional<UserCredential> findByEmail(String email);
+    Optional<UserCredential> findByUserId(String userId);
 }

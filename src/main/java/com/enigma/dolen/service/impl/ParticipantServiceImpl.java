@@ -6,6 +6,7 @@ import com.enigma.dolen.model.entity.Trip;
 import com.enigma.dolen.repository.ParticipantRepository;
 import com.enigma.dolen.service.ParticipantService;
 import com.enigma.dolen.service.TripService;
+import jakarta.servlet.http.Part;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -32,5 +33,24 @@ public class ParticipantServiceImpl implements ParticipantService {
                 .toList();
 
         return participantDTOList;
+    }
+
+    @Override
+    public ParticipantDTO createParticipant(ParticipantDTO participantDTO) {
+        Trip trip = tripService.getTripByIdForOther(participantDTO.getTripId());
+
+        Participant participant = Participant.builder()
+                .participantName(participantDTO.getParticipantName())
+                .contact(participantDTO.getContact())
+                .trip(trip)
+                .build();
+        participantRepository.save(participant);
+
+        return ParticipantDTO.builder()
+                .id(participant.getId())
+                .participantName(participant.getParticipantName())
+                .contact(participant.getContact())
+                .tripId(participant.getTrip().getId())
+                .build();
     }
 }

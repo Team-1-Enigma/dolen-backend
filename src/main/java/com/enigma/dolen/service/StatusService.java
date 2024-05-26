@@ -9,5 +9,5 @@ public interface StatusService {
     Status createStatus(Status status);
     Status getStatus(String orderId);
     List<Status> getStatusByTravelId(String travelId, String status);
-    Status changeStatus(EStatus status, String orderId);
+    Status changeStatus(EStatus eStatus, String orderId);
 }
