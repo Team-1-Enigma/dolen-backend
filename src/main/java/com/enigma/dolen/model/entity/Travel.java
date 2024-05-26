@@ -1,5 +1,6 @@
 package com.enigma.dolen.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -49,4 +50,9 @@ public class Travel {
 
     @OneToMany(mappedBy = "travel")
     private List<Feedback> feedbacks;
+
+    @OneToMany(mappedBy = "travel")
+    @JsonBackReference
+
+    private List<Trip> trips;
 }

@@ -2,8 +2,10 @@ package com.enigma.dolen.service.impl;
 
 import java.util.Optional;
 
+import com.enigma.dolen.constant.ERole;
 import com.enigma.dolen.model.entity.*;
 import com.enigma.dolen.model.exception.ApplicationException;
+import com.enigma.dolen.service.RoleService;
 import com.enigma.dolen.service.UserVerificationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,6 +25,7 @@ public class UserCredentialServiceImpl implements UserCredentialService {
 
     private final UserCredentialRepository userCredentialRepository;
     private final PasswordEncoder passwordEncoder;
+    private final RoleService roleService;
 
     @Override
     public Optional<UserCredential> findByEmail(String email) {
@@ -58,6 +61,16 @@ public class UserCredentialServiceImpl implements UserCredentialService {
     }
 
     @Override
+    public void changeUserRole(ERole eRole, String credentialId) {
+        UserCredential userCredential =  userCredentialRepository.findById(credentialId)
+                .orElseThrow(() -> new ApplicationException("User credential not found", HttpStatus.NOT_FOUND));
+        Role role = roleService.getOrSave(eRole);
+        userCredential.setRole(role);
+
+        userCredentialRepository.save(userCredential);
+    }
+
+    @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         UserCredential userCredential = userCredentialRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Invalid credential"));
@@ -68,4 +81,6 @@ public class UserCredentialServiceImpl implements UserCredentialService {
                 .role(userCredential.getRole().getName())
                 .build();
     }
+
+
 }

@@ -1,5 +1,6 @@
 package com.enigma.dolen.model.dto;
 
+import com.enigma.dolen.model.entity.BankAccount;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -25,10 +26,7 @@ public class TravelRequest {
 
     private String imageUrl;
 
-    private String nameAccount;
-    private String aliasName;
-    private String bankName;
-    private String accountNumber;
+    private List<BankAccount> bankAccounts;
 
     private List<MultipartFile> files;
 }
