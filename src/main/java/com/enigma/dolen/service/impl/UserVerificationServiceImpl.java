@@ -27,13 +27,13 @@ public class UserVerificationServiceImpl implements UserVerificationService {
         UserVerification userVerification = userVerificationRepository.save(UserVerification.builder()
                 .userCredential(userCredential)
                 .verificationCode(randomCode)
-                .isVerified(false)
+                .isVerified(true)
                 .build());
-        try {
-            sendVerificationEmail(userCredential, userVerification, url);
-        } catch (UnsupportedEncodingException e) {
-            throw new ApplicationException("Failed to send verification email", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+//        try {
+//            sendVerificationEmail(userCredential, userVerification, url);
+//        } catch (UnsupportedEncodingException e) {
+//            throw new ApplicationException("Failed to send verification email", HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
 
         return userVerification;
     }
