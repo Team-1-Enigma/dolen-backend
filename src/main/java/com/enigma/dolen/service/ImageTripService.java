@@ -10,5 +10,6 @@ public interface ImageTripService {
     List<ImageTripResponse> createImageTrip(Trip trip, TripRequest tripRequest);
     List<ImageTripResponse> addPhoto(AddPhotoTripRequest addPhotoTripRequest);
     List<ImageTripResponse> getAllPhotoByTravelId(String tripId);
+    List<ImageTripResponse> updateImageTrip(Trip trip, TripRequest tripRequest);
     ImageTripResponse deleteImageTrip(String id);
 }

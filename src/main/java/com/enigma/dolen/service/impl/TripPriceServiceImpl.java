@@ -116,18 +116,13 @@ public class TripPriceServiceImpl implements TripPriceService {
                 .sorted(Comparator.comparing(TripPrice::getCreatedAt).reversed())
                 .limit(2).toList();
 
-        Integer discount = 0;
-        if (tripPrices.get(0).getPrice() > tripPrices.get(1).getPrice()){
-            discount = Math.toIntExact((tripPrices.get(0).getPrice() - tripPrices.get(1).getPrice()) / tripPrices.get(0).getPrice());
-        } else if(tripPrices.get(1).getPrice() > tripPrices.get(0).getPrice()) {
-            discount = Math.toIntExact((tripPrices.get(1).getPrice() - tripPrices.get(0).getPrice()) / tripPrices.get(1).getPrice());
-        }
+        double discount = (tripPrices.get(0).getPrice() > tripPrices.get(1).getPrice()) ? (((double) (tripPrices.get(0).getPrice() - tripPrices.get(1).getPrice()) / tripPrices.get(0).getPrice()) * 100.0) : (((double) (tripPrices.get(1).getPrice() - tripPrices.get(0).getPrice()) / tripPrices.get(1).getPrice()) * 100.0);
 
         return TripPriceDiscountResponse.builder()
                 .tripId(existingTrip.getId())
                 .priceBefore(tripPrices.get(1).getPrice())
                 .priceAfter(tripPrices.get(0).getPrice())
-                .discount(discount)
+                .discount((double) Math.round(discount * 100)/100)
                 .build();
     }
 

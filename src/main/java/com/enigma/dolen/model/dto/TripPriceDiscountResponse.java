@@ -14,5 +14,5 @@ public class TripPriceDiscountResponse {
     private Long priceBefore;
     private Long priceAfter;
 
-    private Integer discount;
+    private Double discount;
 }

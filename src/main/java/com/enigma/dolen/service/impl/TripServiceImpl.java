@@ -194,8 +194,8 @@ public class TripServiceImpl implements TripService {
 
     @Override
     @Transactional(rollbackOn = Exception.class)
-    public TripResponse updateTrip(String tripId, TripDTO tripDTO) {
-        Travel existingTravel = travelService.getTravelByIdForOther(tripDTO.getTravelId());
+    public TripResponse updateTrip(String tripId, TripRequest tripRequest) {
+        Travel existingTravel = travelService.getTravelByIdForOther(tripRequest.getTravelId());
         if (existingTravel == null) {
             return null;
         }
@@ -204,36 +204,38 @@ public class TripServiceImpl implements TripService {
             return null;
         }
 
+        Location location = locationService.getOrSave(tripRequest.getLocationDTO());
+
         Trip trip = Trip.builder()
-                .id(tripDTO.getId())
+                .id(tripId)
                 .travel(existingTravel)
-                .destination(tripDTO.getDestination())
-                .departureDate(LocalDate.parse(tripDTO.getDepartureDate()))
-                .returnDate(LocalDate.parse(tripDTO.getReturnDate()))
-                .imageTrips(existingTrip.getImageTrips())
-                .tripPrices(existingTrip.getTripPrices().stream()
-                        .filter(tripPrice -> tripPrice.getIsActive())
-                        .toList())
-                .itineraries(existingTrip.getItineraries().stream()
-                        .sorted(Comparator.comparing(Itinerary::getCreatedAt).reversed())
-                        .limit(1).toList())
-                .location(existingTrip.getLocation())
+                .destination(tripRequest.getDestination())
+                .departureDate(LocalDate.parse(tripRequest.getDepartureDate()))
+                .returnDate(LocalDate.parse(tripRequest.getReturnDate()))
+                .location(location)
+                .isActive(existingTrip.getIsActive())
                 .updatedAt(LocalDateTime.now())
                 .build();
+
+        List<ImageTripResponse> imageTripResponses = imageTripService.updateImageTrip(existingTrip, tripRequest);
+        List<ItineraryDTO> itineraryDTOList = itineraryService.updateForTrip(existingTrip, tripRequest);
+        TripPriceResponse tripPriceResponse = tripPriceService.addTripPrice(tripId, tripRequest.getTripPriceRequest());
+
+        tripRepository.saveAndFlush(trip);
 
         return TripResponse.builder()
                 .id(trip.getId())
                 .travelId(existingTravel.getId())
                 .destination(trip.getDestination())
                 .locationDTO(LocationDTO.builder()
-                        .city(trip.getLocation().getCity())
-                        .province(trip.getLocation().getProvince())
+                        .city(location.getCity())
+                        .province(location.getProvince())
                         .build())
                 .departureDate(trip.getDepartureDate().toString())
                 .returnDate(trip.getReturnDate().toString())
-                .imageTripResponseList(null)
-                .itineraryDTOList(null)
-                .tripPriceResponse(null)
+                .imageTripResponseList(imageTripResponses)
+                .itineraryDTOList(itineraryDTOList)
+                .tripPriceResponse(tripPriceResponse)
                 .build();
     }
 
@@ -264,12 +266,8 @@ public class TripServiceImpl implements TripService {
         }
 
         for(Itinerary itinerary : existingTrip.getItineraries()){
-            for (ItineraryDetail itineraryDetail : itinerary.getItineraryDetails()){
-                itineraryDetailService.delete(itineraryDetail.getId());
-            }
             itineraryService.delete(itinerary.getId());
         }
-
 
         return existingTrip.getId();
     }

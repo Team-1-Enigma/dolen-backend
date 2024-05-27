@@ -60,8 +60,8 @@ public class TripController {
     }
 
     @PutMapping("/trips/{id}")
-    public ResponseEntity<?> updateTrip(@PathVariable String id, @RequestBody TripDTO tripDTO){
-        TripResponse tripResponse = tripService.updateTrip(id, tripDTO);
+    public ResponseEntity<?> updateTrip(@PathVariable String id, @ModelAttribute TripRequest tripRequest){
+        TripResponse tripResponse = tripService.updateTrip(id, tripRequest);
 
         return ResponseEntity.status(HttpStatus.OK)
                .body(CommonResponse.builder()

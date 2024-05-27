@@ -19,5 +19,7 @@ public interface ItineraryService {
 
     ItineraryDTO update(String id, ItineraryDTO itineraryDTO);
 
+    List<ItineraryDTO> updateForTrip(Trip trip, TripRequest tripRequest);
+
     String delete(String id);
 }
