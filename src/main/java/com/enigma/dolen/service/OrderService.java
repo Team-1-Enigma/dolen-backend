@@ -4,6 +4,7 @@ import com.enigma.dolen.constant.EStatus;
 import com.enigma.dolen.model.dto.BeneficiariesResponse;
 import com.enigma.dolen.model.dto.CreateOrderRequest;
 import com.enigma.dolen.model.dto.OrderResponse;
+import com.enigma.dolen.model.dto.ParticipantDTO;
 
 import java.util.List;
 
@@ -15,4 +16,6 @@ public interface OrderService {
     List<OrderResponse> getOrderByTripId(String tripId, EStatus eStatus);
 
     BeneficiariesResponse payout(String orderId);
+
+    List<ParticipantDTO> getParticipant(String tripId);
 }

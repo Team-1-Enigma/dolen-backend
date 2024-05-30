@@ -1,5 +1,6 @@
 package com.enigma.dolen.model.dto;
 
+import com.enigma.dolen.model.entity.Location;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,4 +24,5 @@ public class TravelAllResponse {
     private Boolean isActive;
 
     private List<String> imageTravelResponseList;
+    private Location location;
 }

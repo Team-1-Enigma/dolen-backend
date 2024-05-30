@@ -20,4 +20,5 @@ public class FeedbackDTO {
     private LocalDateTime updatedAt;
 
     private String travelId;
+    private String userId;
 }

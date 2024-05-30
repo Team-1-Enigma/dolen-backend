@@ -20,4 +20,5 @@ public class FeedbackResponse {
     private LocalDateTime updatedAt;
 
     private TravelDTO travelDTO;
+    private UserDTO userDTO;
 }

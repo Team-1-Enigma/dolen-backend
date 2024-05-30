@@ -13,4 +13,6 @@ public interface TravelService {
     List<TravelCreateResponse> getAllTravel();
     TravelResponse updateTravel(String travelId, TravelDTO travelDTO);
     String deleteTravel(String id);
+
+    TravelResponse getTravelByUserId(String userId);
 }

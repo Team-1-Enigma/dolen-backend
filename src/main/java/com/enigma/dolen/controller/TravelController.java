@@ -130,4 +130,17 @@ public class TravelController {
                        .data(bankAccountResponse)
                        .build());
     }
+
+    @GetMapping("/user/{id}")
+    public ResponseEntity<?> getTravelByUserId(@PathVariable String id){
+        TravelResponse travelResponse = travelService.getTravelByUserId(id);
+
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(CommonResponse.builder()
+                        .message("Bank account found")
+                        .statusCode(HttpStatus.OK.value())
+                        .data(travelResponse)
+                        .build());
+    }
 }

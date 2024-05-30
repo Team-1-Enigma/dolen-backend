@@ -1,6 +1,7 @@
 package com.enigma.dolen.controller;
 
 import com.enigma.dolen.model.dto.*;
+import com.enigma.dolen.model.entity.Trip;
 import com.enigma.dolen.service.ItineraryService;
 import com.enigma.dolen.service.ParticipantService;
 import com.enigma.dolen.service.TripService;
@@ -57,6 +58,17 @@ public class TripController {
                        .statusCode(HttpStatus.OK.value())
                        .data(tripResponses)
                        .build());
+    }
+
+    @GetMapping("/trip/{tripId}")
+    public ResponseEntity<?> getById(@PathVariable String tripId){
+        TripResponse tripResponse = tripService.getTripById(tripId);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(CommonResponse.builder()
+                        .message("Successfully get trip")
+                        .statusCode(HttpStatus.OK.value())
+                        .data(tripResponse)
+                        .build());
     }
 
     @PutMapping("/trips/{id}")

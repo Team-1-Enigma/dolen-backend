@@ -56,9 +56,9 @@ public class TravelServiceImpl implements TravelService {
     public TravelCreateResponse createTravel(TravelRequest travelRequest) {
         UserDTO existingUser = userService.getUserById(travelRequest.getUserId());
         AppUser userCredential = userCredentialService.loadUserById(existingUser.getCredentialId());
-        if(userCredential.getRole() == ERole.TRAVEL_OWNER){
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "YOU ALREADY HAVE TRAVEL");
-        }
+//        if(userCredential.getRole() == ERole.TRAVEL_OWNER){
+//            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "YOU ALREADY HAVE TRAVEL");
+//        }
         userCredentialService.changeUserRole(ERole.TRAVEL_OWNER, existingUser.getCredentialId());
 
         Travel travel = Travel.builder()
@@ -247,5 +247,20 @@ public class TravelServiceImpl implements TravelService {
         }
 
         return travelToDelete.getId();
+    }
+
+    @Override
+    public TravelResponse getTravelByUserId(String userId) {
+        UserDTO user = userService.getUserById(userId);
+
+        Travel travel = travelRepository.findTravelByUser(User.builder()
+                        .id(user.getId())
+                        .fullName(user.getFullName())
+                        .phoneNumber(user.getPhoneNumber())
+                        .address(user.getAddress())
+                        .photoUrl(user.getPhotoUrl())
+                .build());
+
+        return toTravelResponse(travel);
     }
 }

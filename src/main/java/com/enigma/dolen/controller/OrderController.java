@@ -76,4 +76,17 @@ public class OrderController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+
+    @GetMapping("/participant/{tripId}")
+    public ResponseEntity<?> getAllParticipant(@PathVariable String tripId){
+        List<ParticipantDTO> participantDTO = orderService.getParticipant(tripId);
+        CommonResponse<?> response = CommonResponse.<List<ParticipantDTO>>builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("Get All Participant success")
+                .data(participantDTO)
+                .build();
+
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
 }

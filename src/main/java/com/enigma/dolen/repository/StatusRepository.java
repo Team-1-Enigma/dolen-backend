@@ -10,4 +10,5 @@ import java.util.List;
 public interface StatusRepository extends JpaRepository<Status, String> {
     Status getStatusByOrder_Id(String id);
     List<Status> getStatusesByStatusAndOrder_Id(EStatus status, String order_id);
+
 }

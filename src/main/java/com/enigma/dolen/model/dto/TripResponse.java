@@ -1,5 +1,6 @@
 package com.enigma.dolen.model.dto;
 
+import com.enigma.dolen.model.entity.Travel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -25,5 +26,6 @@ public class TripResponse {
     private List<ImageTripResponse> imageTripResponseList;
     private TripPriceResponse tripPriceResponse;
     private List<ItineraryDTO> itineraryDTOList;
+    private TravelDTO travelDTO;
 
 }

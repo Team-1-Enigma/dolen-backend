@@ -16,6 +16,7 @@ import java.time.LocalTime;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -247,9 +248,42 @@ public class OrderServiceImpl implements OrderService {
                         .referenceNos(Collections.singletonList(payoutResponse.getPayouts().get(0).getReferenceNo()))
                 .build());
 
-        statusService.changeStatus(EStatus.ACTIVE, orderId);
+        statusService.changeStatus(EStatus.ACCEPTED, orderId);
 
         return beneficiariesResponse;
+    }
+
+    @Override
+    public List<ParticipantDTO> getParticipant(String tripId) {
+        List<Order> orderList = orderRepository.findOrderByTripId(tripId).orElseThrow(()->new RuntimeException("No data"));
+
+        orderList = orderList.stream()
+                .filter(order -> {
+                    Status status = statusService.getStatus(order.getId());
+
+                    return status.getStatus() == EStatus.ACTIVE;
+                }) // Ganti dengan kondisi yang sesuai dengan struktur status Anda
+                .toList();
+
+
+        List<OrderDetail> orderDetailList = orderList.stream()
+                .flatMap(order -> order.getOrderDetailList().stream()
+                        .map(orderDetail -> OrderDetail.builder()
+                                .participantName(orderDetail.getParticipantName())
+                                .order(order)
+                                .contact(orderDetail.getContact())
+                                .build()
+                        )
+                )
+                .toList();
+
+        List<ParticipantDTO> participantDTOList = orderDetailList.stream().map(orderDetail -> {
+            return ParticipantDTO.builder()
+                    .participantName(orderDetail.getParticipantName())
+                    .contact(orderDetail.getContact())
+                    .build();
+        }).toList();
+        return participantDTOList;
     }
 
 

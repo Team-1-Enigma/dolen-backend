@@ -5,6 +5,7 @@ import com.enigma.dolen.model.entity.*;
 import com.enigma.dolen.repository.TripPriceRepository;
 import com.enigma.dolen.repository.TripRepository;
 import com.enigma.dolen.service.*;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,6 +65,33 @@ public class TripServiceImpl implements TripService {
     @Override
     public Trip getTripByIdForOther(String id) {
         return tripRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    @Transactional
+    public TripResponse getTripById(String tripId){
+        Trip trip = tripRepository.findById(tripId).orElseThrow(() -> new EntityNotFoundException("Not Found"));
+        List<TripPriceResponse> tripPriceResponse = tripPriceService.getTripPriceByTripId(trip.getId());
+        List<ImageTripResponse> imageTripResponses = imageTripService.getAllPhotoByTravelId(tripId);
+        List<ItineraryDTO> itineraryDTOList = itineraryService.getAllItineraryByTripId(tripId);
+        return TripResponse.builder()
+                .id(trip.getId())
+                .destination(trip.getDestination())
+                .tripPriceResponse(tripPriceResponse.get(0))
+                .locationDTO(LocationDTO.builder()
+                        .id(trip.getLocation().getId())
+                        .province(trip.getLocation().getProvince())
+                        .city(trip.getLocation().getCity())
+                        .build())
+                .departureDate(String.valueOf(trip.getDepartureDate()))
+                .returnDate(String.valueOf(trip.getReturnDate()))
+                .imageTripResponseList(imageTripResponses)
+                .travelId(trip.getTravel().getId())
+                .travelDTO(TravelDTO.builder()
+                        .name(trip.getTravel().getName())
+                        .build())
+                .itineraryDTOList(itineraryDTOList)
+                .build();
     }
 
     @Override
