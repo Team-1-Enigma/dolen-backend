@@ -104,6 +104,7 @@ public class TravelServiceImpl implements TravelService {
                 .name(travel.getName())
                 .contactInfo(travel.getContactInfo())
                 .address(travel.getAddress())
+                .isActive(travel.getIsActive())
                 .build();
     }
 
@@ -250,7 +251,7 @@ public class TravelServiceImpl implements TravelService {
     }
 
     @Override
-    public TravelResponse getTravelByUserId(String userId) {
+    public TravelCreateResponse getTravelByUserId(String userId) {
         UserDTO user = userService.getUserById(userId);
 
         Travel travel = travelRepository.findTravelByUser(User.builder()
@@ -261,6 +262,34 @@ public class TravelServiceImpl implements TravelService {
                         .photoUrl(user.getPhotoUrl())
                 .build());
 
-        return toTravelResponse(travel);
+        return TravelCreateResponse.builder()
+                .id(travel.getId())
+                .userId(travel.getUser().getId())
+                .name(travel.getName())
+                .contactInfo(travel.getContactInfo())
+                .address(travel.getAddress())
+                .createdAt(travel.getCreatedAt())
+                .isActive(travel.getIsActive())
+                .bankAccountResponseList(travel.getBankAccounts().stream()
+                        .filter(bankAccount -> bankAccount.getIsActive())
+                        .map(bankAccount -> BankAccountResponse.builder()
+                                .id(bankAccount.getId())
+                                .name(bankAccount.getName())
+                                .bankName(bankAccount.getBankName())
+                                .accountNumber(bankAccount.getAccountNumber())
+                                .aliasName(bankAccount.getAliasName())
+                                .isActive(bankAccount.getIsActive())
+                                .createdAt(bankAccount.getCreatedAt())
+                                .build())
+                        .toList())
+                .imageTravelResponseList(travel.getImageTravels().stream()
+                        .filter(imageTravel -> imageTravel.getIsActive())
+                        .map(imageTravel -> ImageTravelResponse.builder()
+                                .id(imageTravel.getId())
+                                .imageUrl(imageTravel.getImageUrl())
+                                .isActive(imageTravel.getIsActive())
+                                .build()
+                ).toList())
+                .build();
     }
 }
