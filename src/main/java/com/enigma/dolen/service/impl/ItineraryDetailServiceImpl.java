@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
 @Service
@@ -27,12 +28,12 @@ public class ItineraryDetailServiceImpl implements ItineraryDetailService {
         if (existingItinerary == null){
             return null;
         }
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
 
         ItineraryDetail itineraryDetail = ItineraryDetail.builder()
                 .itinerary(itinerary)
-                .startTime(LocalDateTime.parse(itineraryDetailDTO.getStartTime(), formatter))
-                .endTime(LocalDateTime.parse(itineraryDetailDTO.getEndTime(), formatter))
+                .startTime(LocalTime.parse(itineraryDetailDTO.getStartTime(), formatter))
+                .endTime(LocalTime.parse(itineraryDetailDTO.getEndTime(), formatter))
                 .activityDesc(itineraryDetailDTO.getActivityDesc())
                 .build();
 
@@ -51,13 +52,13 @@ public class ItineraryDetailServiceImpl implements ItineraryDetailService {
         if (existingItinerary == null) {
             return null;
         }
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
 
         ItineraryDetail itineraryDetail = ItineraryDetail.builder()
                 .id(id)
                 .itinerary(existingItinerary)
-                .startTime(LocalDateTime.parse(itineraryDetailDTO.getStartTime(), formatter))
-                .endTime(LocalDateTime.parse(itineraryDetailDTO.getEndTime(), formatter))
+                .startTime(LocalTime.parse(itineraryDetailDTO.getStartTime(), formatter))
+                .endTime(LocalTime.parse(itineraryDetailDTO.getEndTime(), formatter))
                 .activityDesc(itineraryDetailDTO.getActivityDesc())
                 .build();
         itineraryDetailRepository.save(itineraryDetail);
@@ -73,13 +74,13 @@ public class ItineraryDetailServiceImpl implements ItineraryDetailService {
 
     @Override
     public ItineraryDetail updateForItinerary(Itinerary itinerary, ItineraryDetailDTO itineraryDetailDTO) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
 
         ItineraryDetail itineraryDetail = ItineraryDetail.builder()
                 .id(itineraryDetailDTO.getId())
                 .itinerary(itinerary)
-                .startTime(LocalDateTime.parse(itineraryDetailDTO.getStartTime(), formatter))
-                .endTime(LocalDateTime.parse(itineraryDetailDTO.getEndTime(), formatter))
+                .startTime(LocalTime.parse(itineraryDetailDTO.getStartTime(), formatter))
+                .endTime(LocalTime.parse(itineraryDetailDTO.getEndTime(), formatter))
                 .activityDesc(itineraryDetailDTO.getActivityDesc())
                 .build();
         return itineraryDetailRepository.save(itineraryDetail);
@@ -87,12 +88,13 @@ public class ItineraryDetailServiceImpl implements ItineraryDetailService {
 
     @Override
     public ItineraryDetail updateForTrip(Itinerary itinerary, ItineraryDetailDTO itineraryDetailDTO) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
 
         ItineraryDetail itineraryDetail = ItineraryDetail.builder()
                 .id(itinerary.getId())
                 .itinerary(itinerary)
-                .startTime(LocalDateTime.parse(itineraryDetailDTO.getStartTime()))
-                .endTime(LocalDateTime.parse(itineraryDetailDTO.getEndTime()))
+                .startTime(LocalTime.parse(itineraryDetailDTO.getStartTime(), formatter))
+                .endTime(LocalTime.parse(itineraryDetailDTO.getEndTime(), formatter))
                 .activityDesc(itineraryDetailDTO.getActivityDesc())
                 .build();
         itineraryDetailRepository.save(itineraryDetail);
